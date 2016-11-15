@@ -23,12 +23,16 @@ extension FlickrClient {
         static let Latitude = "lat"
         static let Longitude = "lon"
         static let SafeSearch = "safe_search"
+        static let Format = "format"
+        static let NoJsonCallBack = "nojsoncallback"
     }
     
     struct ParamaterValues {
         static let PhotoSearchMethod = "flickr.photos.search"
         static let ApiKey = "6b7fd48fed0faa69649860e4eaead7fa"
         static let SafeSearch = "1"
+        static let JsonFormat = "json"
+        static let NoJsonCallBack = "1"
     }
     
     struct ResponseKeys {

@@ -20,6 +20,18 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
+    @IBAction func photoRequestButton(_ sender: UIButton) {
+        
+        FlickrClient.sharedInstance().getPhotosRequest(lat: 40.837049, lon: 74.417097) { success, result, error in
+            
+            if success {
+                print("Results for photo dictionary: \n \(result)")
+            } else {
+                print("error: \(error)")
+            }
+        }
+        
+    }
 
 }
 

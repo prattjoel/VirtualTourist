@@ -12,6 +12,7 @@ class FlickrClient: NSObject {
     
     let sharedSession = URLSession.shared
     
+    // MARK: - Setup Task for GET requests
     func taskForGetMethod (parameters: [String: AnyObject], completionHandlerForGet: @escaping (AnyObject?, NSError?) -> Void) {
         let url = flickrURLFromParameters(parameters: parameters)
         print("URL for photos request is: \n \(url)")
@@ -96,6 +97,7 @@ class FlickrClient: NSObject {
         completionHandlerForConvertData(parsedResult, nil)
     }
     
+    // Create shared instance
     class func sharedInstance() -> FlickrClient {
         struct Singleton {
             static var sharedInstance = FlickrClient()

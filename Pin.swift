@@ -10,6 +10,18 @@ import Foundation
 import CoreData
 
 @objc(Pin)
-public class Pin: NSManagedObject {
+class Pin: NSManagedObject {
+    
+
+    convenience init(lat: Float, lon: Float, incontext context: NSManagedObjectContext) {
+        if let ent = NSEntityDescription.entity(forEntityName: "Pin", in: context) {
+            self.init(entity: ent, insertInto: context)
+            self.lat = lat
+            self.lon = lon
+        } else {
+            fatalError("Unable to find entity")
+        }
+    }
+    
 
 }

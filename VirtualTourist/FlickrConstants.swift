@@ -25,6 +25,7 @@ extension FlickrClient {
         static let SafeSearch = "safe_search"
         static let Format = "format"
         static let NoJsonCallBack = "nojsoncallback"
+        static let Extras = "extras"
     }
     
     struct ParamaterValues {
@@ -33,10 +34,16 @@ extension FlickrClient {
         static let SafeSearch = "1"
         static let JsonFormat = "json"
         static let NoJsonCallBack = "1"
+        static let MediumURL = "url_m"
+        static let DateTaken = "date_taken"
     }
     
     struct ResponseKeys {
         static let Photos = "photos"
         static let Photo = "photo"
+        static let Url = "url_m"
+        static let Date = "datetaken"
+        static let ID = "id"
+        static let Title = "title"
     }
 }

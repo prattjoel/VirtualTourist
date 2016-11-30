@@ -46,32 +46,6 @@ class ViewController: UIViewController {
                 print("\n photos from fetch request: \(photoStore) \n")
                 print("\n photos in store: \(self.store.photoStore) \n")
 
-                
-                //print("Results for photo dictionary: \n \(result)")
-//                var photoImages: [UIImage] = []
-//                
-//                if let photos = result {
-//                    
-//                    
-////                    for photo in photos {
-////                        guard let imagUrlString = photo[FlickrClient.ResponseKeys.Url] as? String else {
-////                            print("error getting url for image")
-////                            return
-////                        }
-////                        
-////                        let imageURL = URL(string: imagUrlString)
-////                        
-////                        if let imageData = NSData(contentsOf: imageURL!) {
-////                            let image = UIImage(data: imageData as Data)
-////                            photoImages.append(image!)
-//                    
-//                        } else {
-//                            print("could not convert image url to data")
-//                            
-//                        }
-//                    }
-//                    print("Photo images array: \n \(photoImages)")
-//                }
             } else {
                 print("error with request: \(error)")
             }

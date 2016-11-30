@@ -86,33 +86,79 @@ extension FlickrClient {
                 return nil
         }
         
+        if let photo = checkDuplicatePhoto(id: id, context: context) {
+            photoToSave = photo
+            // print("\n We have a duplicate photo! \n")
+        } else {
+            
+            guard let urlFromString = NSURL(string: urlString) else {
+                print("could not convert \(urlString) to NSURL")
+                return nil
+            }
+            
+            let imageData = convertImageData(urlString: urlString)
+            
+            let date = formattedDate(dateToFormat: dateTaken)
+            
+            context.performAndWait() {
+                
+                photoToSave = Photo(inContext: context, date: date, id: id, title: title, url: urlFromString, imageData: imageData)
+                print("Photo to save: \(photoToSave)")
+                
+            }
+        }
+        
+        return photoToSave
+    }
+    
+    // Check for photos already saved
+    func checkDuplicatePhoto(id: String, context: NSManagedObjectContext) -> Photo? {
+        let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
+        let predicate = NSPredicate(format: "id == \(id)")
+        fr.predicate = predicate
+        
+        var photos: [Photo]!
+        context.performAndWait {
+            photos = try! context.fetch(fr) as! [Photo]
+        }
+        
+        if photos.count > 0 {
+            return photos.first
+        } else {
+            return nil
+        }
+        
+    }
+    
+    // Convert url for image to NSData
+    func convertImageData(urlString: String) -> NSData {
         var imageData = NSData()
+        
         let url = NSURL(string: urlString)
         
         if let image = NSData(contentsOf: url! as URL) {
             imageData = image
         } else {
             print("Could not convert url to image data")
+
         }
         
+        return imageData
+    }
+    
+    // Format date to Date type
+    func formattedDate(dateToFormat: String) -> Date {
         var date = Date()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
         
-        if let formattedDate = formatter.date(from: "\(dateTaken)") {
+        if let formattedDate = formatter.date(from: "\(dateToFormat)") {
             date = formattedDate
             print("\n formatted date is: \(formattedDate) \n")
+            
         } else {
             print("\n Could not get date from String \n ")
         }
-        
-        context.performAndWait() {
-            
-            photoToSave = Photo(inContext: context, date: date, id: id, title: title, url: url!, imageData: imageData)
-            print("Photo to save: \(photoToSave)")
-            
-        }
-        
-        return photoToSave
+        return date
     }
 }

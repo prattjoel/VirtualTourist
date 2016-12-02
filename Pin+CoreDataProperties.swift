@@ -18,6 +18,6 @@ extension Pin {
 
     @NSManaged public var lat: Float
     @NSManaged public var lon: Float
-    @NSManaged public var photo: Photo?
+    @NSManaged public var photo: Set<NSManagedObject> 
 
 }

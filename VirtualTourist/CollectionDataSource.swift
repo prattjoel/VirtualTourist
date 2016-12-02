@@ -19,7 +19,14 @@ class CollectionDataSource: NSObject, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let id = "UICollectionViewCell"
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! PhotoCell
+        let photo = photos[indexPath.row]
+        
+        let imageData =  photo.imageData
+        let image = UIImage(data: imageData as! Data)
+        
+        cell.cellImageView?.image = image
+        
         return cell
     }
     

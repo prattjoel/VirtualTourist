@@ -14,7 +14,7 @@ extension FlickrClient {
     
     
     // MARK: Request to get photos from FLickr
-    func getPhotosRequest(lat: Float, lon: Float, context: NSManagedObjectContext, completionHandlerForGetPhotosRequest: @escaping (Bool, [Photo]?, NSError?) -> Void) {
+    func getPhotosRequest(lat: Float, lon: Float, context: NSManagedObjectContext, pin: Pin, completionHandlerForGetPhotosRequest: @escaping (Bool, [Photo]?, NSError?) -> Void) {
         
         let paramaters: [String: String] = [
             ParamaterKeys.Method: ParamaterValues.PhotoSearchMethod,
@@ -24,7 +24,8 @@ extension FlickrClient {
             ParamaterKeys.SafeSearch: ParamaterValues.SafeSearch,
             ParamaterKeys.Format: ParamaterValues.JsonFormat,
             ParamaterKeys.NoJsonCallBack: ParamaterValues.NoJsonCallBack,
-            ParamaterKeys.Extras: "\(ParamaterValues.MediumURL),\(ParamaterValues.DateTaken)"
+            ParamaterKeys.Extras: "\(ParamaterValues.MediumURL),\(ParamaterValues.DateTaken)",
+            ParamaterKeys.NumberPerPage: ParamaterValues.NumberOfPhotos
         ]
         
         taskForGetMethod(parameters: paramaters as [String : AnyObject]) { (result, error) in
@@ -52,7 +53,7 @@ extension FlickrClient {
             }
             
             
-            let photos = self.photosFromArray(photosArray: photosArray, context: context)
+            let photos = self.photosFromArray(photosArray: photosArray, context: context, pin: pin)
             
             
             //print("\(photosDictionary)")
@@ -63,11 +64,11 @@ extension FlickrClient {
     }
     
     // Return an array of Photo objects Json array of dictionaries
-    func photosFromArray(photosArray: [[String: AnyObject]], context: NSManagedObjectContext) -> [Photo] {
+    func photosFromArray(photosArray: [[String: AnyObject]], context: NSManagedObjectContext, pin: Pin) -> [Photo] {
         
         var photos = [Photo]()
         for photoDict in photosArray {
-            let photo = photoFromDictionary(photoDict: photoDict, context: context)
+            let photo = photoFromDictionary(photoDict: photoDict, context: context, pin: pin)
             photos.append(photo!)
         }
         
@@ -75,7 +76,7 @@ extension FlickrClient {
     }
     
     // Convert Json photo dictionary to Photo object
-    func photoFromDictionary (photoDict: [String: AnyObject], context: NSManagedObjectContext) -> Photo? {
+    func photoFromDictionary (photoDict: [String: AnyObject], context: NSManagedObjectContext, pin: Pin) -> Photo? {
         var photoToSave: Photo!
         
         guard let dateTaken = photoDict[ResponseKeys.Date] as! String?,
@@ -101,10 +102,16 @@ extension FlickrClient {
             let date = formattedDate(dateToFormat: dateTaken)
             
             context.performAndWait() {
-                
+                print("\n pin for photoToSave (before created): \(pin) \n")
                 photoToSave = Photo(inContext: context, date: date, id: id, title: title, url: urlFromString, imageData: imageData)
-                print("Photo to save: \(photoToSave)")
+                photoToSave.pin = pin 
+               print("Photo to save: \(photoToSave)")
                 
+//                photoToSave.setValue(pin, forKey: "pin")
+//               print("\n pin after photoToSave created: \(photoToSave.pin) \n")
+                // let pinForPhoto = pin.mutableSetValue(forKey: "photo")
+                // pinForPhoto.add(photoToSave)
+                print("\n pin after photoToSave added to pin: \(photoToSave.pin) \n")
             }
         }
         

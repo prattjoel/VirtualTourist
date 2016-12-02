@@ -22,7 +22,7 @@ class Photo: NSManagedObject {
             self.title = title
             self.url = url
             self.imageData = imageData
-            print("photo created")
+            // print("\n pin in photo managed object: \(self.pin) \n")
         } else {
             fatalError("Unable to find Entity")
         }

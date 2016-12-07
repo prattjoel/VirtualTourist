@@ -22,14 +22,19 @@ class CollectionDataSource: NSObject, UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! PhotoCell
         
         
-        // cell.indicator.startAnimating()
-        // let photo = photos[indexPath.row]
         
-//        if let imageData =  photo.imageData {
-//         let image = UIImage(data: imageData as Data)
-//             cell.cellImageView?.image = image
-//             cell.indicator.stopAnimating()
+//        if cell.cellImageView.image != nil {
+//            cell.indicator.stopAnimating()
 //        }
+        
+        // cell.indicator.startAnimating()
+        let photo = photos[indexPath.row]
+        
+        if let imageData =  photo.imageData {
+         let image = UIImage(data: imageData as Data)
+             cell.cellImageView?.image = image
+             cell.indicator.stopAnimating()
+        }
         // cell.indicator.hidesWhenStopped = true
         
         

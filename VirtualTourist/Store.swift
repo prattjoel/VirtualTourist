@@ -56,6 +56,10 @@ class Store {
     
     func addPhotoImage(photo: Photo, completion: @escaping (Photo) -> Void) -> Void {
         
+        if photo.image != nil {
+            completion(photo)
+        } else {
+        
         DispatchQueue.global(qos: .background).async {
             let urlString = photo.url
             let imageData = self.convertImageData(urlString: urlString)
@@ -63,6 +67,7 @@ class Store {
             photo.image = UIImage(data: photo.imageData as! Data)
             
             completion(photo)
+        }
         }
         // return photos
     }

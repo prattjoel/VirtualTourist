@@ -40,6 +40,9 @@ class LocationViewController: UIViewController, UICollectionViewDelegate {
             self.store.photoStore = photos
             self.collectionDataSource.photos = photos
             self.collectionView.reloadData()
+            //self.addImagesToStore(photos: self.collectionDataSource.photos)
+            //self.collectionView.reloadData()
+            
         } else {
             getCurrentPhotos(lat: currentPin!.lat, lon: currentPin!.lon, contextForPhotos: context!, pin: currentPin!)
             //            FlickrClient.sharedInstance().getPhotosRequest(lat: currentPin!.lat, lon: currentPin!.lon, context: context!, pin: currentPin!) { success, result, error in
@@ -141,6 +144,8 @@ class LocationViewController: UIViewController, UICollectionViewDelegate {
                     self.store.photoStore = photoStore!
                     self.collectionDataSource.photos = photoStore!
                     self.collectionView.reloadData()
+                    self.addImagesToStore(photos: self.collectionDataSource.photos)
+                    //self.collectionView.reloadData()
                     
                     print("\n getCurrentPhotos datasource count: \(self.collectionDataSource.photos.count)")
                 }
@@ -154,30 +159,63 @@ class LocationViewController: UIViewController, UICollectionViewDelegate {
                 print("error with request: \(error)")
             }
         }
-        
+    }
+    
+    func addImagesToStore(photos: [Photo]) {
+        for photo in photos {
+            store.addPhotoImage(photo: photo) { result in
+                OperationQueue.main.addOperation {
+                    self.collectionView.reloadData()
+                }
+            }
+            
+            //  collectionDataSource.photos = photos
+        }
     }
     
     //    // MARK: - Collection View Delegate Methods
     
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        
-        let photo = collectionDataSource.photos[indexPath.row]
-        
-        store.addPhotoImage(photo: photo) { result in
-            
-            // let photo = result[indexPath.row]
-            // let image = UIImage(data: photo.imageData as! Data)
-            OperationQueue.main.addOperation {
-                let index = self.collectionDataSource.photos.index(of: photo)!
-                let photoIndexPath = IndexPath(row: index, section: 0)
-                
-                if let cell = collectionView.cellForItem(at: photoIndexPath) as? PhotoCell {
-                    
-                    cell.cellImageView.image = photo.image
-                }
-            }
-        }
-    }
+//    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+//        let photo = collectionDataSource.photos[indexPath.row]
+//        let index = self.collectionDataSource.photos.index(of: photo)!
+//        let photoIndexPath = IndexPath(row: index, section: 0)
+//        
+//        
+//        if let cell = collectionView.cellForItem(at: photoIndexPath) as? PhotoCell {
+//            if let imageData =  photo.imageData {
+//                OperationQueue.main.addOperation {
+//                    let image = UIImage(data: imageData as Data)
+//                    cell.cellImageView?.image = image
+//                    cell.indicator.stopAnimating()
+//                    
+//                }
+//            }
+//        }
+//        
+//    }
+    //
+    //
+    //        let photo = collectionDataSource.photos[indexPath.row]
+    //        let index = self.collectionDataSource.photos.index(of: photo)!
+    //        let photoIndexPath = IndexPath(row: index, section: 0)
+    //
+    //
+    //
+    //        if let cell = collectionView.cellForItem(at: photoIndexPath) as? PhotoCell {
+    //            if cell.cellImageView.image == nil {
+    //                store.addPhotoImage(photo: photo) { result in
+    //
+    //                    // let photo = result[indexPath.row]
+    //                    // let image = UIImage(data: photo.imageData as! Data)
+    //                    OperationQueue.main.addOperation {
+    //
+    //                        cell.cellImageView.image = photo.image
+    //                        cell.indicator.stopAnimating()
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
     
     
     

@@ -13,8 +13,8 @@ import CoreData
 class Photo: NSManagedObject {
     
     
-    convenience init(inContext context: NSManagedObjectContext, date: Date, id: String, title: String, url: NSURL, imageData: NSData) {
-        print("\n Photo object init called \n")
+    convenience init(inContext context: NSManagedObjectContext, date: Date, id: String, title: String, url: String, imageData: NSData?) {
+        // print("\n Photo object init called \n")
         if let ent = NSEntityDescription.entity(forEntityName: "Photo", in: context) {
             self.init(entity: ent, insertInto: context)
             self.dateTaken = date

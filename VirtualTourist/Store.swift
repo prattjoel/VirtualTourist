@@ -14,19 +14,28 @@ class Store {
     let stack = CoreDataStack(modelName: "Model")
     var photoStore = [Photo]()
     
-    func getPhotos(predicate: NSPredicate? = nil, sortDescriptors: [NSSortDescriptor]?) throws -> [Photo] {
+    func getPhotos(predicate: NSPredicate, sortDescriptors: [NSSortDescriptor]?, context: NSManagedObjectContext?) throws -> [Photo]? {
         
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
         fetchRequest.sortDescriptors = sortDescriptors
+//        guard let predicateForFetch = predicate else {
+//            print("no predicate found for fethc request")
+//            return nil
+//        }
+        
         fetchRequest.predicate = predicate
         
-        let mainQContext = stack?.context
+       // print("\n predicate for fetch request: \(fetchRequest.predicate) \n")
+        // print("\n sort descriptors for fetch request: \(fetchRequest.sortDescriptors) \n")
+
+        
+        
         var mainQPhotos: [Photo]?
         var fetchError: Error?
         
-        mainQContext?.performAndWait({
+        context?.performAndWait({
             do {
-                mainQPhotos = try mainQContext?.fetch(fetchRequest) as! [Photo]?
+                mainQPhotos = try context?.fetch(fetchRequest) as! [Photo]?
             } catch let error {
                 fetchError = error
                 
@@ -37,8 +46,37 @@ class Store {
             throw fetchError!
         }
         
+      //  print("\n photos from getPhotos Mehtod: \(photos) \n")
+        
         return photos
         
         
+    }
+    
+    func addPhotoImage(photo: Photo, completion: (Photo) -> Void) -> Void {
+        
+            let urlString = photo.url
+            let imageData = convertImageData(urlString: urlString)
+            photo.imageData = imageData
+            
+        
+        completion(photo)
+       // return photos
+    }
+    
+    // Convert url for image to NSData
+    func convertImageData(urlString: String) -> NSData {
+        var imageData = NSData()
+        
+        let url = NSURL(string: urlString)
+        
+        if let image = NSData(contentsOf: url! as URL) {
+            imageData = image
+        } else {
+            print("Could not convert url to image data in Store \n")
+            
+        }
+        
+        return imageData
     }
 }

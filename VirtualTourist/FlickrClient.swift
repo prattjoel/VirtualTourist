@@ -15,7 +15,7 @@ class FlickrClient: NSObject {
     // MARK: - Setup Task for GET requests
     func taskForGetMethod (parameters: [String: AnyObject], completionHandlerForGet: @escaping (AnyObject?, NSError?) -> Void) {
         let url = flickrURLFromParameters(parameters: parameters)
-        print("URL for photos request is: \n \(url)")
+        // print("URL for photos request is: \n \(url)")
         
         let request = requestSetup(url: url, httpMethod: "GET")
         let task = taskSetup(request: request, domain: "taskForGetMethod", completionHandlerForTask: completionHandlerForGet)
@@ -74,7 +74,7 @@ class FlickrClient: NSObject {
             return
         }
         
-        print("status code is: \n \(statusCode)")
+       // print("status code is: \n \(statusCode)")
         
         guard let data = data else {
             sendError(error: "No data was returned by the request!")

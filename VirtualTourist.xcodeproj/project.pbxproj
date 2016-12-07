@@ -72,6 +72,8 @@
 		5D6B861B1DF07BFF00280FEB /* Model2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model2.xcdatamodel; sourceTree = "<group>"; };
 		5D6B861C1DF085D900280FEB /* MapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		5D6B861E1DF0999B00280FEB /* Model3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model3.xcdatamodel; sourceTree = "<group>"; };
+		5D986E3A1DF8701E00258AE4 /* Model5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model5.xcdatamodel; sourceTree = "<group>"; };
+		5DBE17531DF24B9400BC84DF /* Model4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model4.xcdatamodel; sourceTree = "<group>"; };
 		5DDDEBA51DEF59A3001947CB /* Store.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Store.swift; sourceTree = "<group>"; };
 		5DDDEBA71DEF768A001947CB /* CollectionDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CollectionDataSource.swift; sourceTree = "<group>"; };
 		5DDDEBA91DEF77EA001947CB /* LocationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationViewController.swift; sourceTree = "<group>"; };
@@ -627,11 +629,13 @@
 		5D5FD6471DEE0F9E00D7819A /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				5D986E3A1DF8701E00258AE4 /* Model5.xcdatamodel */,
+				5DBE17531DF24B9400BC84DF /* Model4.xcdatamodel */,
 				5D6B861E1DF0999B00280FEB /* Model3.xcdatamodel */,
 				5D6B861B1DF07BFF00280FEB /* Model2.xcdatamodel */,
 				5D5FD6481DEE0F9E00D7819A /* Model.xcdatamodel */,
 			);
-			currentVersion = 5D6B861E1DF0999B00280FEB /* Model3.xcdatamodel */;
+			currentVersion = 5D986E3A1DF8701E00258AE4 /* Model5.xcdatamodel */;
 			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

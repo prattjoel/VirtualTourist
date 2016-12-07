@@ -20,12 +20,19 @@ class CollectionDataSource: NSObject, UICollectionViewDataSource {
         let id = "UICollectionViewCell"
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! PhotoCell
-        let photo = photos[indexPath.row]
         
-        let imageData =  photo.imageData
-        let image = UIImage(data: imageData as! Data)
         
-        cell.cellImageView?.image = image
+        // cell.indicator.startAnimating()
+        // let photo = photos[indexPath.row]
+        
+//        if let imageData =  photo.imageData {
+//         let image = UIImage(data: imageData as Data)
+//             cell.cellImageView?.image = image
+//             cell.indicator.stopAnimating()
+//        }
+        // cell.indicator.hidesWhenStopped = true
+        
+        
         
         return cell
     }

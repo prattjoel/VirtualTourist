@@ -14,7 +14,7 @@ extension FlickrClient {
     
     
     // MARK: Request to get photos from FLickr
-    func getPhotosRequest(lat: Float, lon: Float, context: NSManagedObjectContext, pin: Pin, completionHandlerForGetPhotosRequest: @escaping (Bool, [Photo]?, NSError?) -> Void) {
+    func getPhotosRequest(lat: Double, lon: Double, context: NSManagedObjectContext, pin: Pin, completionHandlerForGetPhotosRequest: @escaping (Bool, [Photo]?, NSError?) -> Void) {
         
         let paramaters: [String: String] = [
             ParamaterKeys.Method: ParamaterValues.PhotoSearchMethod,
@@ -83,7 +83,7 @@ extension FlickrClient {
             let id = photoDict[ResponseKeys.ID] as! String?,
             let title = photoDict[ResponseKeys.Title] as! String?,
             let urlString = photoDict[ResponseKeys.Url] as! String? else {
-                print("Could get photo properties from Json")
+                print("Couldn't get photo properties from Json")
                 return nil
         }
         
@@ -92,26 +92,26 @@ extension FlickrClient {
             // print("\n We have a duplicate photo! \n")
         } else {
             
-            guard let urlFromString = NSURL(string: urlString) else {
-                print("could not convert \(urlString) to NSURL")
-                return nil
-            }
+//            guard let urlFromString = NSURL(string: urlString) else {
+//                print("could not convert \(urlString) to NSURL")
+//                return nil
+//            }
             
-            let imageData = convertImageData(urlString: urlString)
+           // let imageData = convertImageData(urlString: urlString)
             
             let date = formattedDate(dateToFormat: dateTaken)
             
             context.performAndWait() {
-                print("\n pin for photoToSave (before created): \(pin) \n")
-                photoToSave = Photo(inContext: context, date: date, id: id, title: title, url: urlFromString, imageData: imageData)
+                // print("\n pin for photoToSave (before created): \(pin) \n")
+                photoToSave = Photo(inContext: context, date: date, id: id, title: title, url: urlString, imageData: nil)
                 photoToSave.pin = pin 
-               print("Photo to save: \(photoToSave)")
+              // print("Photo to save: \(photoToSave)")
                 
 //                photoToSave.setValue(pin, forKey: "pin")
 //               print("\n pin after photoToSave created: \(photoToSave.pin) \n")
                 // let pinForPhoto = pin.mutableSetValue(forKey: "photo")
                 // pinForPhoto.add(photoToSave)
-                print("\n pin after photoToSave added to pin: \(photoToSave.pin) \n")
+                // print("\n pin lat from photoToSave: \(photoToSave.pin.lat), from pin: \(pin.lat) \n")
             }
         }
         
@@ -161,7 +161,7 @@ extension FlickrClient {
         
         if let formattedDate = formatter.date(from: "\(dateToFormat)") {
             date = formattedDate
-            print("\n formatted date is: \(formattedDate) \n")
+            // print("\n formatted date is: \(formattedDate) \n")
             
         } else {
             print("\n Could not get date from String \n ")

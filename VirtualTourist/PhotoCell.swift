@@ -10,4 +10,17 @@ import UIKit
 
 class PhotoCell: UICollectionViewCell {
     @IBOutlet var cellImageView: UIImageView!
+    @IBOutlet var indicator: UIActivityIndicatorView!
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // indicator.hidesWhenStopped = true
+        indicator.startAnimating()
+        cellImageView.image = nil
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        indicator.startAnimating()
+    }
 }

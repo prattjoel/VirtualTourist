@@ -104,7 +104,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate {
     // Download photos for the current location
     func getCurrentPhotos(lat: Double, lon: Double, contextForPhotos: NSManagedObjectContext, pin: Pin) {
         print("\n getCurrentPhotos datasource count before request: \(self.collectionDataSource.photos.count)")
-
+        
         FlickrClient.sharedInstance().getPhotosRequest(lat: lat, lon: lon, context: contextForPhotos, pin: pin) { success, result, error in
             
             if success {
@@ -112,13 +112,13 @@ class LocationViewController: UIViewController, UICollectionViewDelegate {
                 //                if let photos = result {
                 //                    self.currentPin?.photo = photos
                 //                }
-//                OperationQueue.main.addOperation {
-//                    self.collectionDataSource.photos = result!
-//                    self.collectionView.reloadData()
-//                    
-//                    print("\n getCurrentPhotos datasource count: \(self.collectionDataSource.photos.count)")
-//                }
-
+                //                OperationQueue.main.addOperation {
+                //                    self.collectionDataSource.photos = result!
+                //                    self.collectionView.reloadData()
+                //
+                //                    print("\n getCurrentPhotos datasource count: \(self.collectionDataSource.photos.count)")
+                //                }
+                
                 do {
                     try self.coreDataStack?.saveContext()
                 } catch let error {
@@ -157,43 +157,45 @@ class LocationViewController: UIViewController, UICollectionViewDelegate {
         
     }
     
-    // MARK: - Collection View Delegate Methods
+    //    // MARK: - Collection View Delegate Methods
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         
         let photo = collectionDataSource.photos[indexPath.row]
         
         store.addPhotoImage(photo: photo) { result in
-        
-        // let photo = result[indexPath.row]
-        let image = UIImage(data: photo.imageData as! Data)
-        OperationQueue.main.addOperation {
-            let index = self.collectionDataSource.photos.index(of: photo)!
-            let photoIndexPath = IndexPath(row: index, section: 0)
             
-            if let cell = collectionView.cellForItem(at: photoIndexPath) as? PhotoCell {
+            // let photo = result[indexPath.row]
+            // let image = UIImage(data: photo.imageData as! Data)
+            OperationQueue.main.addOperation {
+                let index = self.collectionDataSource.photos.index(of: photo)!
+                let photoIndexPath = IndexPath(row: index, section: 0)
                 
-                cell.cellImageView.image = image
+                if let cell = collectionView.cellForItem(at: photoIndexPath) as? PhotoCell {
+                    
+                    cell.cellImageView.image = photo.image
+                }
             }
         }
-        }
-
-    
-//        let storeWithImages = store.addPhotoImage(photos: collectionDataSource.photos)
-//        
-//        let photo = storeWithImages[indexPath.row]
-//        let image = UIImage(data: photo.imageData as! Data)
-//        OperationQueue.main.addOperation {
-//            let index = storeWithImages.index(of: photo)!
-//            let photoIndexPath = IndexPath(row: index, section: 0)
-//            
-//            if let cell = collectionView.cellForItem(at: photoIndexPath) as? PhotoCell {
-//                
-//                cell.cellImageView.image = image
-//            }
-//        }
-//        
     }
+    
+    
+    
+    //        let storeWithImages = store.addPhotoImage(photos: collectionDataSource.photos)
+    //
+    //        let photo = storeWithImages[indexPath.row]
+    //        let image = UIImage(data: photo.imageData as! Data)
+    //        OperationQueue.main.addOperation {
+    //            let index = storeWithImages.index(of: photo)!
+    //            let photoIndexPath = IndexPath(row: index, section: 0)
+    //
+    //            if let cell = collectionView.cellForItem(at: photoIndexPath) as? PhotoCell {
+    //
+    //                cell.cellImageView.image = image
+    //            }
+    //        }
+    //
+    //    }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         // print("\n photo count before deleted: \(collectionDataSource.photos.count) \n")
@@ -209,15 +211,15 @@ class LocationViewController: UIViewController, UICollectionViewDelegate {
         
         // let predicate = NSPredicate(format: "pin == %@", argumentArray: [self.currentPin!])
         // let sortDescriptor = [NSSortDescriptor(key: "dateTaken", ascending: true)]
-       // let photosInContext = photosForPin()
+        // let photosInContext = photosForPin()
         
-       // print("\n Number of photos in context after deleted: \(photosInContext!.count) \n")
+        // print("\n Number of photos in context after deleted: \(photosInContext!.count) \n")
         
         
         
         // MapViewController.coreDataStack = coreDataStack
         self.collectionDataSource.photos.remove(at: indexPath.row)
-      //  print("\n photo count after deleted: \(collectionDataSource.photos.count) \n")
+        //  print("\n photo count after deleted: \(collectionDataSource.photos.count) \n")
         
         self.collectionView.deleteItems(at: [indexPath])
         // let photo = store.photoStore[indexPath.row]

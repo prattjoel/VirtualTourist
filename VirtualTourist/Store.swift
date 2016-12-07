@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 class Store {
     
@@ -18,16 +19,16 @@ class Store {
         
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
         fetchRequest.sortDescriptors = sortDescriptors
-//        guard let predicateForFetch = predicate else {
-//            print("no predicate found for fethc request")
-//            return nil
-//        }
+        //        guard let predicateForFetch = predicate else {
+        //            print("no predicate found for fethc request")
+        //            return nil
+        //        }
         
         fetchRequest.predicate = predicate
         
-       // print("\n predicate for fetch request: \(fetchRequest.predicate) \n")
+        // print("\n predicate for fetch request: \(fetchRequest.predicate) \n")
         // print("\n sort descriptors for fetch request: \(fetchRequest.sortDescriptors) \n")
-
+        
         
         
         var mainQPhotos: [Photo]?
@@ -46,22 +47,24 @@ class Store {
             throw fetchError!
         }
         
-      //  print("\n photos from getPhotos Mehtod: \(photos) \n")
+        //  print("\n photos from getPhotos Mehtod: \(photos) \n")
         
         return photos
         
         
     }
     
-    func addPhotoImage(photo: Photo, completion: (Photo) -> Void) -> Void {
+    func addPhotoImage(photo: Photo, completion: @escaping (Photo) -> Void) -> Void {
         
+        DispatchQueue.global(qos: .background).async {
             let urlString = photo.url
-            let imageData = convertImageData(urlString: urlString)
+            let imageData = self.convertImageData(urlString: urlString)
             photo.imageData = imageData
+            photo.image = UIImage(data: photo.imageData as! Data)
             
-        
-        completion(photo)
-       // return photos
+            completion(photo)
+        }
+        // return photos
     }
     
     // Convert url for image to NSData

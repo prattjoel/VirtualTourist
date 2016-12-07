@@ -8,10 +8,12 @@
 
 import Foundation
 import CoreData
+import UIKit
 
 @objc(Photo)
 class Photo: NSManagedObject {
     
+    var image: UIImage?
     
     convenience init(inContext context: NSManagedObjectContext, date: Date, id: String, title: String, url: String, imageData: NSData?) {
         // print("\n Photo object init called \n")

@@ -84,6 +84,7 @@
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="OhZ-86-1Mr" id="Ijh-Wv-kbL"/>
+                        <outlet property="refreshButton" destination="JAy-cI-788" id="Oc4-0W-81n"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Fpm-fl-Rn7" userLabel="First Responder" sceneMemberID="firstResponder"/>

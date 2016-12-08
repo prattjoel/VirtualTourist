@@ -59,15 +59,15 @@ class Store {
         if photo.image != nil {
             completion(photo)
         } else {
-        
-        DispatchQueue.global(qos: .background).async {
-            let urlString = photo.url
-            let imageData = self.convertImageData(urlString: urlString)
-            photo.imageData = imageData
-            photo.image = UIImage(data: photo.imageData as! Data)
             
-            completion(photo)
-        }
+            DispatchQueue.global(qos: .background).async {
+                let urlString = photo.url
+                let imageData = self.convertImageData(urlString: urlString)
+                photo.imageData = imageData
+                photo.image = UIImage(data: photo.imageData as! Data)
+                
+                completion(photo)
+            }
         }
         // return photos
     }

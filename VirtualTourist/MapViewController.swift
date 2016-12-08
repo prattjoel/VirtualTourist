@@ -182,8 +182,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             //let coordinate = view.annotation?.coordinate
             
             let pin = pins[index!]
-            print("\n the view's latitude is: \(view.annotation?.coordinate.latitude) \n")
-            print("\n the pin's latitude is: \(pin.lat) \n")
+            //print("\n the view's latitude is: \(view.annotation?.coordinate.latitude) \n")
+            //print("\n the pin's latitude is: \(pin.lat) \n")
             
             let controller = storyboard?.instantiateViewController(withIdentifier: "LocationViewController") as! LocationViewController
             controller.currentPin = pin

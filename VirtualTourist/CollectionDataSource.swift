@@ -21,23 +21,16 @@ class CollectionDataSource: NSObject, UICollectionViewDataSource {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: id, for: indexPath) as! PhotoCell
         
-        
-        
-//        if cell.cellImageView.image != nil {
-//            cell.indicator.stopAnimating()
-//        }
-        
-        // cell.indicator.startAnimating()
         let photo = photos[indexPath.row]
         
         if let imageData =  photo.imageData {
          let image = UIImage(data: imageData as Data)
              cell.cellImageView?.image = image
              cell.indicator.stopAnimating()
+            print("UIImage added to cell")
+        } else {
+            print("no image data provided for cell")
         }
-        // cell.indicator.hidesWhenStopped = true
-        
-        
         
         return cell
     }

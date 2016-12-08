@@ -14,7 +14,9 @@ extension FlickrClient {
     
     
     // MARK: Request to get photos from FLickr
-    func getPhotosRequest(lat: Double, lon: Double, context: NSManagedObjectContext, pin: Pin, completionHandlerForGetPhotosRequest: @escaping (Bool, [Photo]?, NSError?) -> Void) {
+    func getPhotosRequest(lat: Double, lon: Double, context: NSManagedObjectContext, pin: Pin, afterRefresh: Bool, completionHandlerForGetPhotosRequest: @escaping (Bool, [Photo]?, NSError?) -> Void) {
+        
+        let pagenumber = arc4random_uniform(10) + 1
         
         let paramaters: [String: String] = [
             ParamaterKeys.Method: ParamaterValues.PhotoSearchMethod,
@@ -25,6 +27,7 @@ extension FlickrClient {
             ParamaterKeys.Format: ParamaterValues.JsonFormat,
             ParamaterKeys.NoJsonCallBack: ParamaterValues.NoJsonCallBack,
             ParamaterKeys.Extras: "\(ParamaterValues.MediumURL),\(ParamaterValues.DateTaken)",
+            ParamaterKeys.PageNumber: "\(pagenumber)",
             ParamaterKeys.NumberPerPage: ParamaterValues.NumberOfPhotos
         ]
         

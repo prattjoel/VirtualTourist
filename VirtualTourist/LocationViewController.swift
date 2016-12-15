@@ -101,7 +101,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
     func getCurrentPhotos(lat: Double, lon: Double, afterRefresh: Bool, contextForPhotos: NSManagedObjectContext, pin: Pin) {
         print("\n getCurrentPhotos datasource count before request: \(self.collectionDataSource.photos.count)")
         
-        FlickrClient.sharedInstance().getPhotosRequest(lat: lat, lon: lon, context: contextForPhotos, pin: pin, afterRefresh: afterRefresh) { success, result, error in
+        FlickrClient.sharedInstance().getPhotosForPageNumber(lat: lat, lon: lon, context: contextForPhotos, pin: pin, afterRefresh: afterRefresh) { success, result, error in
             
             if success {
                 
@@ -137,7 +137,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         }
     }
     
-    // Add Images for each photo object to the collection view
+
     //    func addImagesToStore(photos: [Photo]) {
     //        var imageCount = 0
     //
@@ -171,6 +171,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
     //
     //    }
     
+    // Add Images for each photo object to the collection view
     func addImagesToStore(photos: [Photo]) {
         var imageCount = 0
         
@@ -189,13 +190,6 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
                         print("\n ----------------- addImagesToStore Finished Running -------------- \n")
 
                     }
-                    //let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                    //privateContext.parent = self.context!
-                    
-                    //privateContext.perform {
-                    //self.saveContext()
-                    //}
-                    
                 }
             }
         }

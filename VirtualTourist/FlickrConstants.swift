@@ -38,7 +38,7 @@ extension FlickrClient {
         static let NoJsonCallBack = "1"
         static let MediumURL = "url_m"
         static let DateTaken = "date_taken"
-        static let NumberOfPhotos = "100"
+        static let NumberOfPhotos = "20"
     }
     
     struct ResponseKeys {
@@ -50,5 +50,6 @@ extension FlickrClient {
         static let Title = "title"
         static let Page = "page"
         static let Total = "total"
+        static let NumberOfPages = "pages"
     }
 }

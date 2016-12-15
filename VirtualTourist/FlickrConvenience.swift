@@ -13,10 +13,99 @@ extension FlickrClient {
     
     
     
-    // MARK: Request to get photos from FLickr
-    func getPhotosRequest(lat: Double, lon: Double, context: NSManagedObjectContext, pin: Pin, afterRefresh: Bool, completionHandlerForGetPhotosRequest: @escaping (Bool, [Photo]?, NSError?) -> Void) {
+    //Make request for photos based on pages available
+    func getPhotosForPageNumber(lat: Double, lon: Double, context: NSManagedObjectContext, pin: Pin, afterRefresh: Bool, completionHandlerForGetPhotosForPageNumber: @escaping (Bool, [Photo]?, NSError?) -> Void) -> Void {
+        getNumberOfPhotos(lat: lat, lon: lon, context: context, pin: pin, afterRefresh: afterRefresh){ (success, pages, error) in
+
+            if success {
+                //var numOfPages = ""
+                guard let pagesForPhotos = pages else {
+                    print("no pages found")
+                    return
+                }
+                
+                let pageNumbers = pagesForPhotos
+                print("\n Number of pages for request is: \(pageNumbers) \n")
+                
+                self.getPhotosRequest(lat: lat, lon: lon, pages: pageNumbers, context: context, pin: pin, afterRefresh: afterRefresh, completionHandlerForGetPhotosRequest: completionHandlerForGetPhotosForPageNumber)
+                
+            } else {
+                print("\n no pages for getPhotosForPageNumber \(error) \n")
+                
+            }
+            
+//            guard error == nil else {
+//                completionHandlerForGetPhotosForPageNumber(false, nil, error)
+//                return
+//            }
+            
+            
+        }
+    }
+    
+    
+    // Get page number for photos available from Flickr
+    
+    func getNumberOfPhotos(lat: Double, lon: Double, context: NSManagedObjectContext, pin: Pin, afterRefresh: Bool, completionHandlerForGetNumberOfPhotos: @escaping (Bool, Int?, NSError?) -> Void) {
         
-        let pagenumber = arc4random_uniform(10) + 1
+        let paramaters: [String: String] = [
+            ParamaterKeys.Method: ParamaterValues.PhotoSearchMethod,
+            ParamaterKeys.ApiKey: ParamaterValues.ApiKey,
+            ParamaterKeys.Latitude: "\(lat)",
+            ParamaterKeys.Longitude: "\(lon)",
+            ParamaterKeys.SafeSearch: ParamaterValues.SafeSearch,
+            ParamaterKeys.Format: ParamaterValues.JsonFormat,
+            ParamaterKeys.NoJsonCallBack: ParamaterValues.NoJsonCallBack,
+            ParamaterKeys.Extras: "\(ParamaterValues.MediumURL),\(ParamaterValues.DateTaken)",
+            ParamaterKeys.NumberPerPage: ParamaterValues.NumberOfPhotos
+        ]
+        
+        taskForGetMethod(parameters: paramaters as [String : AnyObject]) { (result, error) in
+            
+            guard error == nil else {
+                completionHandlerForGetNumberOfPhotos(false, nil, error)
+                return
+            }
+            
+            guard let result = result as? [String: AnyObject] else {
+                completionHandlerForGetNumberOfPhotos(false, nil, NSError(domain: "getNumberOfPhotos", code: 1, userInfo: [NSLocalizedDescriptionKey: "No result from getNumberOfPhotos"]))
+                return
+            }
+            
+            print("Result from photos request: \n \(result)")
+
+            guard let photosDictionary = result[ResponseKeys.Photos] as? [String: AnyObject] else {
+                completionHandlerForGetNumberOfPhotos(false, nil, NSError(domain: "getNumberOfPhotos", code: 1, userInfo: [NSLocalizedDescriptionKey: "could not parse getNumberOfPhotos"]))
+                return
+            }
+            
+            print("\n Photos Dictionary in getNumberOfPhotos is: \(photosDictionary) \n")
+
+            
+//            guard let pagesDict = result[ResponseKeys.NumberOfPages] as? [[String: AnyObject]] else {
+//                completionHandlerForGetNumberOfPhotos(false, nil, NSError(domain: "getNumberOfPhotos", code: 1, userInfo: [NSLocalizedDescriptionKey: "could not get pages dictionary from getNumberOfPhotos"]))
+//                return
+//            }
+            
+//            print("\n pages dictionary in getNumberOfPhotos: \(pagesDict) \n")
+            
+            
+            guard let pages = photosDictionary[ResponseKeys.NumberOfPages] as? Int else {
+                completionHandlerForGetNumberOfPhotos(false, nil, NSError(domain: "getNumberOfPhotos", code: 1, userInfo: [NSLocalizedDescriptionKey: "could not get numeber of pages from getNumberOfPhotos"]))
+                return
+            }
+            
+            print("\n pages found after getNumberOfPhotos: \(pages) \n")
+            
+            completionHandlerForGetNumberOfPhotos(true, pages, nil)
+        }
+
+    }
+    
+    // MARK: Request to get photos from FLickr
+    func getPhotosRequest(lat: Double, lon: Double, pages: Int, context: NSManagedObjectContext, pin: Pin, afterRefresh: Bool, completionHandlerForGetPhotosRequest: @escaping (Bool, [Photo]?, NSError?) -> Void) {
+        
+        let pagenumber = arc4random_uniform(UInt32(pages)) + 1
         
         let paramaters: [String: String] = [
             ParamaterKeys.Method: ParamaterValues.PhotoSearchMethod,

@@ -28,7 +28,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         super.viewDidLoad()
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(refreshPhotos))
-
+        
         
         createMapPin()
         
@@ -119,7 +119,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
                     self.collectionDataSource.photos = photoStore!
                     self.collectionView.reloadData()
                     self.addImagesToStore(photos: self.collectionDataSource.photos)
-                        
+                    
                     
                     //self.collectionView.reloadData()
                     
@@ -138,37 +138,67 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
     }
     
     // Add Images for each photo object to the collection view
+    //    func addImagesToStore(photos: [Photo]) {
+    //        var imageCount = 0
+    //
+    //        store.addPhotoImage(photos: photos, context: context!, completionForImage: { photo in
+    //
+    //            DispatchQueue.main.async {
+    //                let index = self.collectionDataSource.photos.index(of: photo)
+    //                let indexPath = IndexPath.init(row: index!, section: 0)
+    //                self.collectionView.reloadItems(at: [indexPath])
+    //                imageCount += 1
+    //                print("\n -------------Image number \(imageCount) added to CollectionView --------------- \n")
+    //                //let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+    //                //privateContext.parent = self.context!
+    //
+    //                //privateContext.perform {
+    //                //self.saveContext()
+    //                //}
+    //
+    //            }
+    //
+    //
+    //        }, completion: { completion in
+    //
+    //            DispatchQueue.main.async {
+    //            self.saveContext()
+    //            }
+    //
+    //        })
+    //
+    //        print("\n ----------------- addImagesToStore Finished Running -------------- \n")
+    //
+    //    }
+    
     func addImagesToStore(photos: [Photo]) {
         var imageCount = 0
-       
-        store.addPhotoImage(photos: photos, context: context!, completionForImage: { photo in
         
-            DispatchQueue.main.async {
-                let index = self.collectionDataSource.photos.index(of: photo)
-                let indexPath = IndexPath.init(row: index!, section: 0)
-                self.collectionView.reloadItems(at: [indexPath])
-                imageCount += 1
-                print("\n -------------Image number \(imageCount) added to CollectionView --------------- \n")
-                //let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                //privateContext.parent = self.context!
+        for photo in photos {
+            store.addPhotoImage(photo: photo, context: context!) { completion in
                 
-                //privateContext.perform {
-                //self.saveContext()
-                //}
-                
-            }
+                DispatchQueue.main.async {
+                    let index = self.collectionDataSource.photos.index(of: photo)
+                    let indexPath = IndexPath.init(row: index!, section: 0)
+                    self.collectionView.reloadItems(at: [indexPath])
+                    imageCount += 1
+                    print("\n -------------Image number \(imageCount) added to CollectionView --------------- \n")
+                    
+                    if imageCount == photos.count {
+                        self.saveContext()
+                        print("\n ----------------- addImagesToStore Finished Running -------------- \n")
 
-        
-        }, completion: { completion in
-            
-            DispatchQueue.main.async {
-            self.saveContext()
+                    }
+                    //let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+                    //privateContext.parent = self.context!
+                    
+                    //privateContext.perform {
+                    //self.saveContext()
+                    //}
+                    
+                }
             }
-            
-        })
-        
-        print("\n ----------------- addImagesToStore Finished Running -------------- \n")
-
+        }
     }
     
     //    // MARK: - CollectionView Delegate Methods
@@ -214,7 +244,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
             annotation.coordinate = coordinate
             mapView.region = MKCoordinateRegion(center: coordinate, span: MKCoordinateSpan(latitudeDelta: 1.0, longitudeDelta: 1.0))
             mapView.addAnnotation(annotation)
-
+            
         }
     }
     
@@ -233,7 +263,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         } else {
             pinView!.annotation = annotation
         }
-
+        
         
         return pinView
     }

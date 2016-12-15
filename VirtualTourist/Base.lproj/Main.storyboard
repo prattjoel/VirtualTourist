@@ -6,7 +6,6 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -23,8 +22,11 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="OhZ-86-1Mr">
-                                <rect key="frame" x="20" y="20" width="374" height="696"/>
+                                <rect key="frame" x="0.0" y="277" width="414" height="459"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="459" id="UiO-o9-1mj"/>
+                                </constraints>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="L2R-HD-SWT">
                                     <size key="itemSize" width="50" height="50"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -64,32 +66,39 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="NTX-bo-z2I">
+                                <rect key="frame" x="0.0" y="20" width="414" height="241"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="241" id="CgA-fp-wFc"/>
+                                </constraints>
+                            </mapView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JAy-cI-788">
-                                <rect key="frame" x="181" y="686" width="53" height="30"/>
+                                <rect key="frame" x="166" y="675" width="82" height="41"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                 <state key="normal" title="Refresh"/>
-                                <connections>
-                                    <action selector="refreshPhotosWithSender:" destination="Fkz-wY-RS7" eventType="touchUpInside" id="Mi6-Sl-Y1k"/>
-                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="FIZ-Zb-Rxf" firstAttribute="top" secondItem="JAy-cI-788" secondAttribute="bottom" constant="20" id="8pe-O8-3ZE"/>
-                            <constraint firstItem="OhZ-86-1Mr" firstAttribute="top" secondItem="toA-oq-gRc" secondAttribute="bottom" id="Ig4-Ho-b02"/>
-                            <constraint firstItem="OhZ-86-1Mr" firstAttribute="trailing" secondItem="FBJ-lA-H29" secondAttribute="trailingMargin" id="Pps-LD-QNk"/>
-                            <constraint firstItem="JAy-cI-788" firstAttribute="centerX" secondItem="FBJ-lA-H29" secondAttribute="centerX" id="fs8-ye-TRU"/>
-                            <constraint firstItem="FIZ-Zb-Rxf" firstAttribute="top" secondItem="OhZ-86-1Mr" secondAttribute="bottom" constant="20" id="nah-A8-9yF"/>
-                            <constraint firstItem="OhZ-86-1Mr" firstAttribute="leading" secondItem="FBJ-lA-H29" secondAttribute="leadingMargin" id="vEb-Ok-OzI"/>
+                            <constraint firstItem="FIZ-Zb-Rxf" firstAttribute="top" secondItem="JAy-cI-788" secondAttribute="bottom" constant="20" id="23M-nT-BXq"/>
+                            <constraint firstAttribute="trailing" secondItem="NTX-bo-z2I" secondAttribute="trailing" id="WII-6F-TBZ"/>
+                            <constraint firstAttribute="trailing" secondItem="OhZ-86-1Mr" secondAttribute="trailing" id="Y5p-si-rp8"/>
+                            <constraint firstItem="NTX-bo-z2I" firstAttribute="top" secondItem="toA-oq-gRc" secondAttribute="bottom" id="hHX-cS-CSa"/>
+                            <constraint firstItem="JAy-cI-788" firstAttribute="centerX" secondItem="FBJ-lA-H29" secondAttribute="centerX" id="jSU-Ux-MZs"/>
+                            <constraint firstItem="FIZ-Zb-Rxf" firstAttribute="top" secondItem="OhZ-86-1Mr" secondAttribute="bottom" id="tp2-SO-YWa"/>
+                            <constraint firstItem="OhZ-86-1Mr" firstAttribute="leading" secondItem="FBJ-lA-H29" secondAttribute="leading" id="vQK-oy-xqh"/>
+                            <constraint firstItem="NTX-bo-z2I" firstAttribute="leading" secondItem="FBJ-lA-H29" secondAttribute="leading" id="wuX-Eu-utd"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="collectionView" destination="OhZ-86-1Mr" id="Ijh-Wv-kbL"/>
+                        <outlet property="mapView" destination="NTX-bo-z2I" id="QN3-tY-bxn"/>
                         <outlet property="refreshButton" destination="JAy-cI-788" id="Oc4-0W-81n"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Fpm-fl-Rn7" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="821.73913043478262" y="114.94565217391305"/>
+            <point key="canvasLocation" x="785.50724637681162" y="82.33695652173914"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="UPb-dA-h2f">

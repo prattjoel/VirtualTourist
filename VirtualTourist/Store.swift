@@ -54,20 +54,31 @@ class Store {
         
     }
     
-    func addPhotoImage(photo: Photo, completion: @escaping (Photo) -> Void) -> Void {
+    func addPhotoImage(photos: [Photo], context: NSManagedObjectContext, completionForImage: @escaping (Photo) -> Void, completion: @escaping () -> Void) -> Void {
         
-        if photo.image != nil {
-            completion(photo)
-        } else {
-            
-            DispatchQueue.global(qos: .background).async {
-                let urlString = photo.url
-                let imageData = self.convertImageData(urlString: urlString)
-                photo.imageData = imageData
-                photo.image = UIImage(data: photo.imageData as! Data)
-                
-                completion(photo)
+        DispatchQueue.global(qos: .background).async {
+            for photo in photos {
+                if photo.image != nil {
+                    completionForImage(photo)
+                } else {
+                    
+                    
+                    //let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+                    //privateContext.parent = context
+                    
+                    //privateContext.perform {
+                    let urlString = photo.url
+                    let imageData = self.convertImageData(urlString: urlString)
+                    photo.imageData = imageData
+                    photo.image = UIImage(data: photo.imageData as! Data)
+                    
+                    completionForImage(photo)
+                    // }
+                    
+                }
             }
+            
+            completion()
         }
         // return photos
     }

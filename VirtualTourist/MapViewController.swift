@@ -22,8 +22,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
+                
         mapView.delegate = self
         
         
@@ -143,7 +142,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-            pinView!.canShowCallout = true
             pinView!.pinTintColor = .red
             pinView!.canShowCallout = false
             

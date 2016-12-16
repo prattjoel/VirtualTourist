@@ -238,6 +238,12 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         collectionView.reloadData()
     }
     
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        let width = view.frame.size.width / 3.2
+        //let height = layout.itemSize.
+        return CGSize(width: width, height: width)
+    }
+    
     //Creat pin for mapView
     
     func createMapPin(){

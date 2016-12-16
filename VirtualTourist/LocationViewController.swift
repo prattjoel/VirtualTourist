@@ -104,26 +104,36 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         FlickrClient.sharedInstance().getPhotosForPageNumber(lat: lat, lon: lon, context: contextForPhotos, pin: pin, afterRefresh: afterRefresh) { success, result, error in
             
             if success {
-                
-                do {
-                    try self.coreDataStack?.saveContext()
-                } catch let error {
-                    print("error saving context \(error)")
-                }
-                
-                let photoStore = self.photosForPin()
-                
-                
-                DispatchQueue.main.async {
-                    self.store.photoStore = photoStore!
-                    self.collectionDataSource.photos = photoStore!
-                    self.collectionView.reloadData()
-                    self.addImagesToStore(photos: self.collectionDataSource.photos)
+                if result != nil {
+                    
+                    do {
+                        try self.coreDataStack?.saveContext()
+                    } catch let error {
+                        print("error saving context \(error)")
+                    }
+                    
+                    let photoStore = self.photosForPin()
                     
                     
-                    //self.collectionView.reloadData()
+                    DispatchQueue.main.async {
+                        self.store.photoStore = photoStore!
+                        self.collectionDataSource.photos = photoStore!
+                        self.collectionView.reloadData()
+                        self.addImagesToStore(photos: self.collectionDataSource.photos)
+                        
+                        
+                        //self.collectionView.reloadData()
+                        
+                        print("\n getCurrentPhotos datasource count: \(self.collectionDataSource.photos.count)")
+                    }
+                } else {
                     
-                    print("\n getCurrentPhotos datasource count: \(self.collectionDataSource.photos.count)")
+                    self.presentAlertContoller(title: "No photos found", message: "No photos found for this location.  Please select another location")
+                    print("No photos found for this location")
+                    
+                    // let controller = self.storyboard?.instantiateViewController(withIdentifier: "LocationViewController") as? LocationViewController
+            
+
                 }
                 
                 
@@ -137,7 +147,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         }
     }
     
-
+    
     //    func addImagesToStore(photos: [Photo]) {
     //        var imageCount = 0
     //
@@ -188,7 +198,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
                     if imageCount == photos.count {
                         self.saveContext()
                         print("\n ----------------- addImagesToStore Finished Running -------------- \n")
-
+                        
                     }
                 }
             }
@@ -260,6 +270,24 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         
         
         return pinView
+    }
+    
+    func presentAlertContoller(title: String, message: String) {
+        let alertContoller = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default) { handler in
+            self.context?.delete(self.currentPin!)
+            self.saveContext()
+            
+            if let controller = self.navigationController {
+                controller.popViewController(animated: true)
+            } else {
+                print("No nav controller found")
+            }
+        }
+        
+        alertContoller.addAction(okAction)
+        
+        present(alertContoller, animated: true, completion: nil)
     }
     
 }

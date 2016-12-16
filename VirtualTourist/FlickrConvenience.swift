@@ -24,10 +24,13 @@ extension FlickrClient {
                     return
                 }
                 
-                let pageNumbers = pagesForPhotos
-                print("\n Number of pages for request is: \(pageNumbers) \n")
+               
+                if pagesForPhotos > 0 {
+                self.getPhotosRequest(lat: lat, lon: lon, pages: pagesForPhotos, context: context, pin: pin, afterRefresh: afterRefresh, completionHandlerForGetPhotosRequest: completionHandlerForGetPhotosForPageNumber)
+                } else {
+                    completionHandlerForGetPhotosForPageNumber(true, nil, nil)
+                }
                 
-                self.getPhotosRequest(lat: lat, lon: lon, pages: pageNumbers, context: context, pin: pin, afterRefresh: afterRefresh, completionHandlerForGetPhotosRequest: completionHandlerForGetPhotosForPageNumber)
                 
             } else {
                 print("\n no pages for getPhotosForPageNumber \(error) \n")

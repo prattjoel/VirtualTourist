@@ -31,7 +31,11 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         // stack = MapViewController.coreDataStack
+        
+        mapView.removeAnnotations(annotations)
+        
         fetchPinsFromContext()
+        print("\n the annotations count in viewWillAppear is: \(annotations.count) \n")
     }
     
     
@@ -120,6 +124,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     // Adds pins from context to map view
     func addPinsToMap(pins: [Pin]) {
+        annotations.removeAll()
         for pin in pins {
             
             let annotation = MKPointAnnotation()

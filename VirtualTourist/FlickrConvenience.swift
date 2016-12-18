@@ -18,12 +18,10 @@ extension FlickrClient {
         getNumberOfPhotos(lat: lat, lon: lon, context: context, pin: pin, afterRefresh: afterRefresh){ (success, pages, error) in
 
             if success {
-                //var numOfPages = ""
                 guard let pagesForPhotos = pages else {
                     print("no pages found")
                     return
                 }
-                
                
                 if pagesForPhotos > 0 {
                 self.getPhotosRequest(lat: lat, lon: lon, pages: pagesForPhotos, context: context, pin: pin, afterRefresh: afterRefresh, completionHandlerForGetPhotosRequest: completionHandlerForGetPhotosForPageNumber)
@@ -36,13 +34,6 @@ extension FlickrClient {
                 print("\n no pages for getPhotosForPageNumber \(error) \n")
                 
             }
-            
-//            guard error == nil else {
-//                completionHandlerForGetPhotosForPageNumber(false, nil, error)
-//                return
-//            }
-            
-            
         }
     }
     
@@ -75,22 +66,14 @@ extension FlickrClient {
                 return
             }
             
-            print("Result from photos request: \n \(result)")
+           // print("Result from photos request: \n \(result)")
 
             guard let photosDictionary = result[ResponseKeys.Photos] as? [String: AnyObject] else {
                 completionHandlerForGetNumberOfPhotos(false, nil, NSError(domain: "getNumberOfPhotos", code: 1, userInfo: [NSLocalizedDescriptionKey: "could not parse getNumberOfPhotos"]))
                 return
             }
             
-            print("\n Photos Dictionary in getNumberOfPhotos is: \(photosDictionary) \n")
-
-            
-//            guard let pagesDict = result[ResponseKeys.NumberOfPages] as? [[String: AnyObject]] else {
-//                completionHandlerForGetNumberOfPhotos(false, nil, NSError(domain: "getNumberOfPhotos", code: 1, userInfo: [NSLocalizedDescriptionKey: "could not get pages dictionary from getNumberOfPhotos"]))
-//                return
-//            }
-            
-//            print("\n pages dictionary in getNumberOfPhotos: \(pagesDict) \n")
+          //  print("\n Photos Dictionary in getNumberOfPhotos is: \(photosDictionary) \n")
             
             
             guard let pages = photosDictionary[ResponseKeys.NumberOfPages] as? Int else {
@@ -98,7 +81,7 @@ extension FlickrClient {
                 return
             }
             
-            print("\n pages found after getNumberOfPhotos: \(pages) \n")
+          //  print("\n pages found after getNumberOfPhotos: \(pages) \n")
             
             completionHandlerForGetNumberOfPhotos(true, pages, nil)
         }
@@ -187,26 +170,11 @@ extension FlickrClient {
             // print("\n We have a duplicate photo! \n")
         } else {
             
-//            guard let urlFromString = NSURL(string: urlString) else {
-//                print("could not convert \(urlString) to NSURL")
-//                return nil
-//            }
-            
-           // let imageData = convertImageData(urlString: urlString)
-            
             let date = formattedDate(dateToFormat: dateTaken)
             
             context.performAndWait() {
-                // print("\n pin for photoToSave (before created): \(pin) \n")
-                photoToSave = Photo(inContext: context, date: date, id: id, title: title, url: urlString, imageData: nil)
-                photoToSave.pin = pin 
-              // print("Photo to save: \(photoToSave)")
-                
-//                photoToSave.setValue(pin, forKey: "pin")
-//               print("\n pin after photoToSave created: \(photoToSave.pin) \n")
-                // let pinForPhoto = pin.mutableSetValue(forKey: "photo")
-                // pinForPhoto.add(photoToSave)
-                // print("\n pin lat from photoToSave: \(photoToSave.pin.lat), from pin: \(pin.lat) \n")
+                photoToSave = Photo(inContext: context, date: date, id: id, title: title, url: urlString)
+                photoToSave.pin = pin
             }
         }
         

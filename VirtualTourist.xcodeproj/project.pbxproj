@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		5D4C98211DD4DF9C00327AA1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D4C98201DD4DF9C00327AA1 /* AppDelegate.swift */; };
-		5D4C98231DD4DF9C00327AA1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D4C98221DD4DF9C00327AA1 /* ViewController.swift */; };
 		5D4C98261DD4DF9C00327AA1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5D4C98241DD4DF9C00327AA1 /* Main.storyboard */; };
 		5D4C98281DD4DF9C00327AA1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D4C98271DD4DF9C00327AA1 /* Assets.xcassets */; };
 		5D4C982B1DD4DF9C00327AA1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5D4C98291DD4DF9C00327AA1 /* LaunchScreen.storyboard */; };
@@ -50,7 +49,6 @@
 /* Begin PBXFileReference section */
 		5D4C981D1DD4DF9C00327AA1 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5D4C98201DD4DF9C00327AA1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		5D4C98221DD4DF9C00327AA1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		5D4C98251DD4DF9C00327AA1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		5D4C98271DD4DF9C00327AA1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5D4C982A1DD4DF9C00327AA1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -186,7 +184,6 @@
 		5D5FD6521DEE151300D7819A /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				5D4C98221DD4DF9C00327AA1 /* ViewController.swift */,
 				5DDDEBA91DEF77EA001947CB /* LocationViewController.swift */,
 				5D6B861C1DF085D900280FEB /* MapViewController.swift */,
 			);
@@ -350,7 +347,6 @@
 				5D4C98521DD4E04D00327AA1 /* FlickrConstants.swift in Sources */,
 				5D5FD6501DEE10C200D7819A /* Pin.swift in Sources */,
 				5DDDEBA81DEF768A001947CB /* CollectionDataSource.swift in Sources */,
-				5D4C98231DD4DF9C00327AA1 /* ViewController.swift in Sources */,
 				5D5FD6491DEE0F9E00D7819A /* Model.xcdatamodeld in Sources */,
 				5DDDEBAA1DEF77EA001947CB /* LocationViewController.swift in Sources */,
 				5DDDEBAC1DEF9205001947CB /* CoreDataStack.swift in Sources */,

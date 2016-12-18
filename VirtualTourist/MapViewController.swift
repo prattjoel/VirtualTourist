@@ -17,29 +17,23 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     var annotations = [MKPointAnnotation]()
     var pins = [Pin]()
-    // static var coreDataStack = CoreDataStack(modelName: "Model")
-    var stack = CoreDataStack(modelName: "Model")
+    var CoreStack = CoreDataStack(modelName: "Model")
     
     override func viewDidLoad() {
         super.viewDidLoad()
-                
+        
         mapView.delegate = self
-        
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // stack = MapViewController.coreDataStack
         
         mapView.removeAnnotations(annotations)
-        
         fetchPinsFromContext()
         print("\n the annotations count in viewWillAppear is: \(annotations.count) \n")
     }
     
-    
-    //MARK: - Initial pin creation methods
+    // MARK: - Initial pin creation methods
     
     // Create pin after long press
     @IBAction func addPin(_ sender: UILongPressGestureRecognizer) {
@@ -53,21 +47,28 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             mapView.addAnnotation(annotation)
             annotations.append(annotation)
             
-            if let pin = addPinToContext(context: stack!.context, coordinate: coordinate) {
-                pins.append(pin)
+            guard let stack = CoreStack else {
+                print("No stack found for addPin")
+                return
+            }
+            
+            if let pin = addPinToContext(context: stack.context, coordinate: coordinate) {
+                //pins.append(pin)
+                mapView.removeAnnotations(annotations)
                 
-                let controller = storyboard?.instantiateViewController(withIdentifier: "LocationViewController") as! LocationViewController
-                controller.currentPin = pin
-               // print("\n pin set in map controllert: \(controller.currentPin) \n")
-                controller.context = stack!.context
-                controller.coreDataStack = stack
-                self.navigationController?.pushViewController(controller, animated: true)
-                //present(controller, animated: true, completion: nil)
-                // print("\n coordinate if location is: \(annotation.coordinate) \n")
+                fetchPinsFromContext()
+                print("addPin: Pins in context \(pins.count)")
+                print("addPin: annotations in map \(annotations.count)")
+                
+                //                let controller = storyboard?.instantiateViewController(withIdentifier: "LocationViewController") as! LocationViewController
+                //                controller.currentPin = pin
+                //                controller.objContext = stack.context
+                //                controller.coreDataStack = stack
+                //                self.navigationController?.pushViewController(controller, animated: true)
+            } else {
+                print("no pin found for addPin")
             }
         }
-        
-        
     }
     
     // Add pin to context
@@ -82,13 +83,9 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         let predicate = NSPredicate(format: "lat == %@ AND lon == %@", "\(lat)", "\(lon)" )
         fr.predicate = predicate
         
-       // print("\n ------ predicate for pinsToCheck --------- \n \(fr.predicate)")
-        
         context.performAndWait {
             pinsToCheck = try! context.fetch(fr) as! [Pin]
         }
-        
-        // print("\n pins to check returned: \(pinsToCheck) \n")
         
         if pinsToCheck.count > 0 {
             return pinsToCheck.first
@@ -96,9 +93,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             context.performAndWait {
                 pin = Pin.init(lat: lat, lon: lon, incontext: context)
             }
-           // print("\n pin added to context: \(pin) \n")
             
-           // pins.append(pin!)
             print("\n number of current pins is \(pins.count) \n")
             
             return pin
@@ -109,22 +104,26 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     
     // Get pins from context to populate map view.
     func fetchPinsFromContext() {
-        let contextForFetch = stack?.context
+        guard let stack = CoreStack else {
+            print("No stack found for fetchPinsFromContext")
+            return
+        }
+        let context = stack.context
         var pins: [Pin]?
         
-        if let context = contextForFetch {
-            let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
-            context.performAndWait {
-                pins = try! context.fetch(fr) as! [Pin]
-            }
-            print("pins in context for fetch in MapView: \(pins?.count)")
+        let fr = NSFetchRequest<NSFetchRequestResult>(entityName: "Pin")
+        context.performAndWait {
+            pins = try! context.fetch(fr) as! [Pin]
         }
+        print("pins in context for fetch in MapView: \(pins?.count)")
+        
         addPinsToMap(pins: pins!)
     }
     
     // Adds pins from context to map view
     func addPinsToMap(pins: [Pin]) {
         annotations.removeAll()
+        self.pins.removeAll()
         for pin in pins {
             
             let annotation = MKPointAnnotation()
@@ -150,53 +149,43 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             pinView!.pinTintColor = .red
             pinView!.canShowCallout = false
             
-            
-            
         } else {
             pinView!.annotation = annotation
         }
-        
-        //        if pinView?.isSelected == true {
-        //            let coordinate = pinView?.annotation?.coordinate
-        //
-        //            let pin = addPinToContext(context: stack!.context, coordinate: coordinate!)
-        //
-        //            let controller = storyboard?.instantiateViewController(withIdentifier: "LocationViewController") as! LocationViewController
-        //            controller.currentPin = pin
-        //            print("\n pin set in map controllert: \(controller.currentPin) \n")
-        //            controller.context = stack!.context
-        //            controller.coreDataStack = stack
-        //            self.navigationController?.pushViewController(controller, animated: true)
-        //        }
         
         return pinView
     }
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         
-        // view.setSelected(false, animated: true)
         if view.isSelected == true {
             
+            //mapView.removeAnnotations(annotations)
+            //fetchPinsFromContext()
             print("\n number of pins: \(pins.count)")
             print("\n number of annotations: \(annotations.count) \n")
             
-            let index = annotations.index(of: view.annotation as! MKPointAnnotation)
+            //            guard let annotation = view.annotation else {
+            //                print("the select pin does not have an annotation")
+            //                return
+            //            }
             
-            //let coordinate = view.annotation?.coordinate
-            
-            let pin = pins[index!]
-            //print("\n the view's latitude is: \(view.annotation?.coordinate.latitude) \n")
-            //print("\n the pin's latitude is: \(pin.lat) \n")
-            
-            let controller = storyboard?.instantiateViewController(withIdentifier: "LocationViewController") as! LocationViewController
-            controller.currentPin = pin
-            //print("\n pin set in map controllert: \(controller.currentPin) \n")
-            controller.context = stack!.context
-             controller.coreDataStack = stack
-            self.navigationController?.pushViewController(controller, animated: true)
+            if let index = annotations.index(of: view.annotation as! MKPointAnnotation) {
+                
+                let pin = pins[index]
+                
+                let controller = storyboard?.instantiateViewController(withIdentifier: "LocationViewController") as! LocationViewController
+                controller.currentPin = pin
+                guard let stack = CoreStack else {
+                    print("No stack found for didSelect View")
+                    return
+                }
+                controller.objContext = stack.context
+                controller.coreDataStack = stack
+                self.navigationController?.pushViewController(controller, animated: true)
+            } else {
+                print("No index found for selected pin")
+            }
         }
-        
-        
     }
-    
 }

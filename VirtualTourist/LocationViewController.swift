@@ -13,14 +13,14 @@ import MapKit
 class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapViewDelegate {
     
     @IBOutlet var collectionView: UICollectionView!
-    @IBOutlet weak var refreshButton: UIButton!
     @IBOutlet weak var mapView: MKMapView!
     
     var coreDataStack: CoreDataStack?
     var store = Store()
     var collectionDataSource = CollectionDataSource()
     var currentPin : Pin?
-    var context: NSManagedObjectContext?
+    var objContext: NSManagedObjectContext?
+    // var backgroundContext: NSManagedObjectContext?
     var cell = PhotoCell()
     
     
@@ -28,6 +28,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         super.viewDidLoad()
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(refreshPhotos))
+        self.navigationItem.rightBarButtonItem?.isEnabled = false
         
         
         createMapPin()
@@ -47,21 +48,30 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
             self.store.photoStore = photos
             self.collectionDataSource.photos = photos
             self.collectionView.reloadData()
-            refreshButton.isEnabled = true
-            //self.addImagesToStore(photos: self.collectionDataSource.photos)
-            //self.collectionView.reloadData()
+            self.navigationItem.rightBarButtonItem?.isEnabled = true
             
         } else {
-            getCurrentPhotos(lat: currentPin!.lat, lon: currentPin!.lon, afterRefresh: false, contextForPhotos: context!, pin: currentPin!)
+            if let pin = currentPin, let context = objContext {
+                getCurrentPhotos(lat: pin.lat, lon: pin.lon, afterRefresh: false, contextForPhotos: context, pin: pin)
+            } else {
+                print("no current pin or context")
+            }
         }
         
         
     }
     
     func refreshPhotos() {
-        // collectionDataSource.photos.removeAll()
+        navigationItem.rightBarButtonItem?.isEnabled = false
+        
         clearPhotosFromPin()
-        getCurrentPhotos(lat:currentPin!.lat, lon: currentPin!.lon, afterRefresh: true, contextForPhotos: context!, pin: currentPin!)
+        
+        
+        if let pin = currentPin, let context = objContext {
+            getCurrentPhotos(lat:pin.lat, lon: pin.lon, afterRefresh: true, contextForPhotos: context, pin: currentPin!)
+        } else {
+            print("no current pin or context")
+        }
         
     }
     
@@ -69,9 +79,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
     func photosForPin() -> [Photo]? {
         let predicate = NSPredicate(format: "pin == %@", argumentArray: [self.currentPin!])
         let sortDescriptor = [NSSortDescriptor(key: "dateTaken", ascending: true)]
-        let photosInContext = try! self.store.getPhotos(predicate: predicate, sortDescriptors: sortDescriptor, context: self.context)
-        
-        // print("\n Number of photos in context: \(photosInContext!.count) \n")
+        let photosInContext = try! self.store.getPhotos(predicate: predicate, sortDescriptors: sortDescriptor, context: self.objContext)
         
         return photosInContext
     }
@@ -80,7 +88,11 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
     func clearPhotosFromPin(){
         if let photos = photosForPin() {
             for photo in photos {
-                context?.delete(photo)
+                if let context = objContext {
+                    context.delete(photo)
+                } else {
+                    print("No context found to delete photos in clearPhotosFromPin")
+                }
             }
             saveContext()
             collectionDataSource.photos.removeAll()
@@ -89,6 +101,8 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
     
     //Save the Managed Object Context
     func saveContext() {
+        
+        
         do {
             try self.coreDataStack?.saveContext()
             print("\n ------------context saved------------------ \n")
@@ -105,24 +119,21 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
             
             if success {
                 if result != nil {
-                    
-                    do {
-                        try self.coreDataStack?.saveContext()
-                    } catch let error {
-                        print("error saving context \(error)")
-                    }
-                    
-                    let photoStore = self.photosForPin()
-                    
-                    
                     DispatchQueue.main.async {
+                        do {
+                            try self.coreDataStack?.saveContext()
+                        } catch let error {
+                            print("error saving context \(error)")
+                        }
+                        
+                        let photoStore = self.photosForPin()
+                        
+                        
+                        
                         self.store.photoStore = photoStore!
                         self.collectionDataSource.photos = photoStore!
                         self.collectionView.reloadData()
                         self.addImagesToStore(photos: self.collectionDataSource.photos)
-                        
-                        
-                        //self.collectionView.reloadData()
                         
                         print("\n getCurrentPhotos datasource count: \(self.collectionDataSource.photos.count)")
                     }
@@ -130,16 +141,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
                     
                     self.presentAlertContoller(title: "No photos found", message: "No photos found for this location.  Please select another location")
                     print("No photos found for this location")
-                    
-                    // let controller = self.storyboard?.instantiateViewController(withIdentifier: "LocationViewController") as? LocationViewController
-            
-
                 }
-                
-                
-                // print("\n photos from fetch request: \(photoStore) \n")
-                // print("\n photos in store: \(self.store.photoStore) \n")
-                // print("\n the current pin is: \(self.currentPin) \n")
                 
             } else {
                 print("error with request: \(error)")
@@ -147,48 +149,34 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         }
     }
     
-    
-    //    func addImagesToStore(photos: [Photo]) {
-    //        var imageCount = 0
-    //
-    //        store.addPhotoImage(photos: photos, context: context!, completionForImage: { photo in
-    //
-    //            DispatchQueue.main.async {
-    //                let index = self.collectionDataSource.photos.index(of: photo)
-    //                let indexPath = IndexPath.init(row: index!, section: 0)
-    //                self.collectionView.reloadItems(at: [indexPath])
-    //                imageCount += 1
-    //                print("\n -------------Image number \(imageCount) added to CollectionView --------------- \n")
-    //                //let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-    //                //privateContext.parent = self.context!
-    //
-    //                //privateContext.perform {
-    //                //self.saveContext()
-    //                //}
-    //
-    //            }
-    //
-    //
-    //        }, completion: { completion in
-    //
-    //            DispatchQueue.main.async {
-    //            self.saveContext()
-    //            }
-    //
-    //        })
-    //
-    //        print("\n ----------------- addImagesToStore Finished Running -------------- \n")
-    //
-    //    }
-    
     // Add Images for each photo object to the collection view
     func addImagesToStore(photos: [Photo]) {
         var imageCount = 0
         
+//        guard let stack = coreDataStack else {
+//            print("no stack for addImagesTo Store")
+//            return
+//        }
+        
+      //  let backgroundContext = stack.backgroundContext
+        
+        guard let context = objContext else {
+            print("No context for addImagesToStore")
+            return
+        }
+        
         for photo in photos {
-            store.addPhotoImage(photo: photo, context: context!) { completion in
+            
+            let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+            privateContext.parent = self.objContext
+            
+            self.store.addPhotoImage(photo: photo, context: context) { data in
                 
                 DispatchQueue.main.async {
+                    
+                    photo.imageData = data
+                    photo.image = UIImage(data: photo.imageData as! Data)
+                    
                     let index = self.collectionDataSource.photos.index(of: photo)
                     let indexPath = IndexPath.init(row: index!, section: 0)
                     self.collectionView.reloadItems(at: [indexPath])
@@ -197,50 +185,35 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
                     
                     if imageCount == photos.count {
                         self.saveContext()
+                        self.navigationItem.rightBarButtonItem?.isEnabled = true
                         print("\n ----------------- addImagesToStore Finished Running -------------- \n")
-                        
                     }
                 }
             }
         }
     }
     
-    //    // MARK: - CollectionView Delegate Methods
+    // MARK: - CollectionView Delegate Methods
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        // print("\n photo count before deleted: \(collectionDataSource.photos.count) \n")
-        // self.collectionView.remove
-        // store.photoStore.remove(at: indexPath.row)
+        
         let photo = collectionDataSource.photos[indexPath.row]
-        context?.delete(photo)
+        objContext?.delete(photo)
         do {
             try coreDataStack?.saveContext()
         } catch let error {
             print("error saving context \(error)")
         }
         
-        // let predicate = NSPredicate(format: "pin == %@", argumentArray: [self.currentPin!])
-        // let sortDescriptor = [NSSortDescriptor(key: "dateTaken", ascending: true)]
-        // let photosInContext = photosForPin()
-        
-        // print("\n Number of photos in context after deleted: \(photosInContext!.count) \n")
-        
-        
-        
-        // MapViewController.coreDataStack = coreDataStack
         self.collectionDataSource.photos.remove(at: indexPath.row)
-        //  print("\n photo count after deleted: \(collectionDataSource.photos.count) \n")
         
         self.collectionView.deleteItems(at: [indexPath])
-        // let photo = store.photoStore[indexPath.row]
-        
         
         collectionView.reloadData()
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
         let width = view.frame.size.width / 3.2
-        //let height = layout.itemSize.
         return CGSize(width: width, height: width)
     }
     
@@ -281,7 +254,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
     func presentAlertContoller(title: String, message: String) {
         let alertContoller = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default) { handler in
-            self.context?.delete(self.currentPin!)
+            self.objContext?.delete(self.currentPin!)
             self.saveContext()
             
             if let controller = self.navigationController {

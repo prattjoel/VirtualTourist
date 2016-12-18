@@ -72,19 +72,12 @@
                                     <constraint firstAttribute="height" constant="241" id="CgA-fp-wFc"/>
                                 </constraints>
                             </mapView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JAy-cI-788">
-                                <rect key="frame" x="166" y="675" width="82" height="41"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
-                                <state key="normal" title="Refresh"/>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="FIZ-Zb-Rxf" firstAttribute="top" secondItem="JAy-cI-788" secondAttribute="bottom" constant="20" id="23M-nT-BXq"/>
                             <constraint firstAttribute="trailing" secondItem="NTX-bo-z2I" secondAttribute="trailing" id="WII-6F-TBZ"/>
                             <constraint firstAttribute="trailing" secondItem="OhZ-86-1Mr" secondAttribute="trailing" id="Y5p-si-rp8"/>
                             <constraint firstItem="NTX-bo-z2I" firstAttribute="top" secondItem="toA-oq-gRc" secondAttribute="bottom" id="hHX-cS-CSa"/>
-                            <constraint firstItem="JAy-cI-788" firstAttribute="centerX" secondItem="FBJ-lA-H29" secondAttribute="centerX" id="jSU-Ux-MZs"/>
                             <constraint firstItem="FIZ-Zb-Rxf" firstAttribute="top" secondItem="OhZ-86-1Mr" secondAttribute="bottom" id="tp2-SO-YWa"/>
                             <constraint firstItem="OhZ-86-1Mr" firstAttribute="leading" secondItem="FBJ-lA-H29" secondAttribute="leading" id="vQK-oy-xqh"/>
                             <constraint firstItem="NTX-bo-z2I" firstAttribute="leading" secondItem="FBJ-lA-H29" secondAttribute="leading" id="wuX-Eu-utd"/>
@@ -93,7 +86,6 @@
                     <connections>
                         <outlet property="collectionView" destination="OhZ-86-1Mr" id="Ijh-Wv-kbL"/>
                         <outlet property="mapView" destination="NTX-bo-z2I" id="QN3-tY-bxn"/>
-                        <outlet property="refreshButton" destination="JAy-cI-788" id="Oc4-0W-81n"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Fpm-fl-Rn7" userLabel="First Responder" sceneMemberID="firstResponder"/>

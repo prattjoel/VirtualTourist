@@ -23,7 +23,6 @@ class Photo: NSManagedObject {
             self.id = id
             self.title = title
             self.url = url
-            //self.imageData = imageData
         } else {
             fatalError("Unable to find Entity")
         }

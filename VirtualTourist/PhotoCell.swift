@@ -14,7 +14,6 @@ class PhotoCell: UICollectionViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // indicator.hidesWhenStopped = true
         indicator.startAnimating()
         cellImageView.image = nil
     }

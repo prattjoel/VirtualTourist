@@ -20,32 +20,26 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
     var collectionDataSource = CollectionDataSource()
     var currentPin : Pin?
     var objContext: NSManagedObjectContext?
-    // var backgroundContext: NSManagedObjectContext?
     var cell = PhotoCell()
     
     
+    // MARK: View Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Refresh", style: .plain, target: self, action: #selector(refreshPhotos))
         self.navigationItem.rightBarButtonItem?.isEnabled = false
         
-        
         createMapPin()
         
         collectionView.dataSource = collectionDataSource
         collectionView.delegate = self
         
-        print("\n viewDidLoad datasource count: \(collectionDataSource.photos.count)")
-        
-        
         guard let photos = photosForPin() else {
             print("there were no photos for the pin")
             return
         }
-        
         if photos.count > 0 {
-            self.store.photoStore = photos
             self.collectionDataSource.photos = photos
             self.collectionView.reloadData()
             self.navigationItem.rightBarButtonItem?.isEnabled = true
@@ -57,17 +51,43 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
                 print("no current pin or context")
             }
         }
-        
-        
     }
     
+    //MARK: Get photos for pin
+    
+    // Get photos for the current location
+    func getCurrentPhotos(lat: Double, lon: Double, afterRefresh: Bool, contextForPhotos: NSManagedObjectContext, pin: Pin) {
+        
+        FlickrClient.sharedInstance().getPhotosForPageNumber(lat: lat, lon: lon, context: contextForPhotos, pin: pin, afterRefresh: afterRefresh) { success, result, error in
+            
+            if success {
+                if result != nil {
+                    DispatchQueue.main.async {
+                        self.saveContext()
+                        
+                        let photoStore = self.photosForPin()
+                        self.collectionDataSource.photos = photoStore!
+                        self.collectionView.reloadData()
+                        self.addImagesToStore(photos: self.collectionDataSource.photos)
+                    }
+                } else {
+                    self.presentAlertContoller(title: "No photos found", message: "No photos found for this location.  Please select another location")
+                    print("No photos found for this location")
+                }
+                
+            } else {
+                print("error with request: \(error)")
+                self.presentAlertContoller(title: "Request Error", message: "Looks like something went wrong.  Try again in a few minutes.")
+            }
+        }
+    }
+    
+    // Get new photos for pin
     func refreshPhotos() {
         navigationItem.rightBarButtonItem?.isEnabled = false
-        
         clearPhotosFromPin()
         
-        
-        if let pin = currentPin, let context = objContext {
+            if let pin = currentPin, let context = objContext {
             getCurrentPhotos(lat:pin.lat, lon: pin.lon, afterRefresh: true, contextForPhotos: context, pin: currentPin!)
         } else {
             print("no current pin or context")
@@ -82,6 +102,47 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         let photosInContext = try! self.store.getPhotos(predicate: predicate, sortDescriptors: sortDescriptor, context: self.objContext)
         
         return photosInContext
+    }
+    
+    // Add Images for each photo object to the collection view
+    func addImagesToStore(photos: [Photo]) {
+        var imageCount = 0
+        guard let context = objContext else {
+            print("No context for addImagesToStore")
+            return
+        }
+        for photo in photos {
+            self.store.addPhotoImage(photo: photo, context: context) { data in
+                
+                DispatchQueue.main.async {
+                    photo.imageData = data
+                    photo.image = UIImage(data: photo.imageData as! Data)
+                    if let index = self.collectionDataSource.photos.index(of: photo) {
+                        let indexPath = IndexPath.init(row: index, section: 0)
+                        self.collectionView.reloadItems(at: [indexPath])
+                        imageCount += 1
+                        if imageCount == photos.count {
+                            self.saveContext()
+                            self.navigationItem.rightBarButtonItem?.isEnabled = true
+                        }
+                    } else {
+                        print("No index found for addImagesToStore")
+                    }
+                }
+            }
+        }
+    }
+    
+    //MARK: Context helper methods
+    
+    //Save the Managed Object Context
+    func saveContext() {
+        
+        do {
+            try self.coreDataStack?.saveContext()
+        } catch let error {
+            print("error saving context \(error)")
+        }
     }
     
     // Empty photos for current pin in preparation for refresh
@@ -99,123 +160,7 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         }
     }
     
-    //Save the Managed Object Context
-    func saveContext() {
-        
-        
-        do {
-            try self.coreDataStack?.saveContext()
-            print("\n ------------context saved------------------ \n")
-        } catch let error {
-            print("error saving context \(error)")
-        }
-    }
-    
-    // Download photos for the current location
-    func getCurrentPhotos(lat: Double, lon: Double, afterRefresh: Bool, contextForPhotos: NSManagedObjectContext, pin: Pin) {
-        print("\n getCurrentPhotos datasource count before request: \(self.collectionDataSource.photos.count)")
-        
-        FlickrClient.sharedInstance().getPhotosForPageNumber(lat: lat, lon: lon, context: contextForPhotos, pin: pin, afterRefresh: afterRefresh) { success, result, error in
-            
-            if success {
-                if result != nil {
-                    DispatchQueue.main.async {
-                        do {
-                            try self.coreDataStack?.saveContext()
-                        } catch let error {
-                            print("error saving context \(error)")
-                        }
-                        
-                        let photoStore = self.photosForPin()
-                        
-                        
-                        
-                        self.store.photoStore = photoStore!
-                        self.collectionDataSource.photos = photoStore!
-                        self.collectionView.reloadData()
-                        self.addImagesToStore(photos: self.collectionDataSource.photos)
-                        
-                        print("\n getCurrentPhotos datasource count: \(self.collectionDataSource.photos.count)")
-                    }
-                } else {
-                    
-                    self.presentAlertContoller(title: "No photos found", message: "No photos found for this location.  Please select another location")
-                    print("No photos found for this location")
-                }
-                
-            } else {
-                print("error with request: \(error)")
-            }
-        }
-    }
-    
-    // Add Images for each photo object to the collection view
-    func addImagesToStore(photos: [Photo]) {
-        var imageCount = 0
-        
-//        guard let stack = coreDataStack else {
-//            print("no stack for addImagesTo Store")
-//            return
-//        }
-        
-      //  let backgroundContext = stack.backgroundContext
-        
-        guard let context = objContext else {
-            print("No context for addImagesToStore")
-            return
-        }
-        
-        for photo in photos {
-            
-            let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-            privateContext.parent = self.objContext
-            
-            self.store.addPhotoImage(photo: photo, context: context) { data in
-                
-                DispatchQueue.main.async {
-                    
-                    photo.imageData = data
-                    photo.image = UIImage(data: photo.imageData as! Data)
-                    
-                    let index = self.collectionDataSource.photos.index(of: photo)
-                    let indexPath = IndexPath.init(row: index!, section: 0)
-                    self.collectionView.reloadItems(at: [indexPath])
-                    imageCount += 1
-                    print("\n -------------Image number \(imageCount) added to CollectionView --------------- \n")
-                    
-                    if imageCount == photos.count {
-                        self.saveContext()
-                        self.navigationItem.rightBarButtonItem?.isEnabled = true
-                        print("\n ----------------- addImagesToStore Finished Running -------------- \n")
-                    }
-                }
-            }
-        }
-    }
-    
-    // MARK: - CollectionView Delegate Methods
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
-        let photo = collectionDataSource.photos[indexPath.row]
-        objContext?.delete(photo)
-        do {
-            try coreDataStack?.saveContext()
-        } catch let error {
-            print("error saving context \(error)")
-        }
-        
-        self.collectionDataSource.photos.remove(at: indexPath.row)
-        
-        self.collectionView.deleteItems(at: [indexPath])
-        
-        collectionView.reloadData()
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
-        let width = view.frame.size.width / 3.2
-        return CGSize(width: width, height: width)
-    }
+    //MARK: Mapview helper method
     
     //Creat pin for mapView
     
@@ -268,5 +213,27 @@ class LocationViewController: UIViewController, UICollectionViewDelegate, MKMapV
         
         present(alertContoller, animated: true, completion: nil)
     }
+    
+    // MARK: - CollectionView Delegate Methods
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        let photo = collectionDataSource.photos[indexPath.row]
+        objContext?.delete(photo)
+        
+        saveContext()
+        
+        self.collectionDataSource.photos.remove(at: indexPath.row)
+        
+        self.collectionView.deleteItems(at: [indexPath])
+        
+        collectionView.reloadData()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        let width = view.frame.size.width / 3.2
+        return CGSize(width: width, height: width)
+    }
+    
     
 }

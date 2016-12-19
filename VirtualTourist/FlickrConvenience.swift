@@ -12,6 +12,7 @@ import CoreData
 extension FlickrClient {
     
     
+    //MARK: - Request for photos with random page number
     
     //Make request for photos based on pages available
     func getPhotosForPageNumber(lat: Double, lon: Double, context: NSManagedObjectContext, pin: Pin, afterRefresh: Bool, completionHandlerForGetPhotosForPageNumber: @escaping (Bool, [Photo]?, NSError?) -> Void) -> Void {
@@ -22,7 +23,6 @@ extension FlickrClient {
                     print("no pages found")
                     return
                 }
-               
                 if pagesForPhotos > 0 {
                 self.getPhotosRequest(lat: lat, lon: lon, pages: pagesForPhotos, context: context, pin: pin, afterRefresh: afterRefresh, completionHandlerForGetPhotosRequest: completionHandlerForGetPhotosForPageNumber)
                 } else {
@@ -31,7 +31,7 @@ extension FlickrClient {
                 
                 
             } else {
-                print("\n no pages for getPhotosForPageNumber \(error) \n")
+                completionHandlerForGetPhotosForPageNumber(false, nil, NSError(domain: "getPhotosForPageNumber", code: 1, userInfo: [NSLocalizedDescriptionKey: "could not get pages from getPhotosForPageNumber"]))
                 
             }
         }
@@ -66,32 +66,32 @@ extension FlickrClient {
                 return
             }
             
-           // print("Result from photos request: \n \(result)")
-
             guard let photosDictionary = result[ResponseKeys.Photos] as? [String: AnyObject] else {
                 completionHandlerForGetNumberOfPhotos(false, nil, NSError(domain: "getNumberOfPhotos", code: 1, userInfo: [NSLocalizedDescriptionKey: "could not parse getNumberOfPhotos"]))
                 return
             }
-            
-          //  print("\n Photos Dictionary in getNumberOfPhotos is: \(photosDictionary) \n")
-            
             
             guard let pages = photosDictionary[ResponseKeys.NumberOfPages] as? Int else {
                 completionHandlerForGetNumberOfPhotos(false, nil, NSError(domain: "getNumberOfPhotos", code: 1, userInfo: [NSLocalizedDescriptionKey: "could not get numeber of pages from getNumberOfPhotos"]))
                 return
             }
             
-          //  print("\n pages found after getNumberOfPhotos: \(pages) \n")
-            
             completionHandlerForGetNumberOfPhotos(true, pages, nil)
         }
 
     }
     
-    // MARK: Request to get photos from FLickr
+    // Request to get photos from FLickr
     func getPhotosRequest(lat: Double, lon: Double, pages: Int, context: NSManagedObjectContext, pin: Pin, afterRefresh: Bool, completionHandlerForGetPhotosRequest: @escaping (Bool, [Photo]?, NSError?) -> Void) {
         
-        let pagenumber = arc4random_uniform(UInt32(pages)) + 1
+        var maxPages = 1
+        if pages > 100 {
+            maxPages = 100
+        } else {
+            maxPages = pages
+        }
+        
+        let pagenumber = arc4random_uniform(UInt32(maxPages)) + 1
         
         let paramaters: [String: String] = [
             ParamaterKeys.Method: ParamaterValues.PhotoSearchMethod,
@@ -118,8 +118,6 @@ extension FlickrClient {
                 return
             }
             
-            //print("Result from photos request: \n \(result)")
-            
             guard let photosDictionary = result[ResponseKeys.Photos] as? [String: AnyObject] else {
                 completionHandlerForGetPhotosRequest(false, nil, NSError(domain: "getPhotosRequest", code: 1, userInfo: [NSLocalizedDescriptionKey: "could not parse getPhotosRequest"]))
                 return
@@ -133,13 +131,12 @@ extension FlickrClient {
             
             let photos = self.photosFromArray(photosArray: photosArray, context: context, pin: pin)
             
-            
-            //print("\(photosDictionary)")
-            
             completionHandlerForGetPhotosRequest(true, photos, nil)
             
         }
     }
+    
+    //MARK: - Response data helper methods
     
     // Return an array of Photo objects Json array of dictionaries
     func photosFromArray(photosArray: [[String: AnyObject]], context: NSManagedObjectContext, pin: Pin) -> [Photo] {
@@ -161,13 +158,12 @@ extension FlickrClient {
             let id = photoDict[ResponseKeys.ID] as! String?,
             let title = photoDict[ResponseKeys.Title] as! String?,
             let urlString = photoDict[ResponseKeys.Url] as! String? else {
-                print("Couldn't get photo properties from Json")
+                print("Could not get photo properties from Json")
                 return nil
         }
         
         if let photo = checkDuplicatePhoto(id: id, context: context) {
             photoToSave = photo
-            // print("\n We have a duplicate photo! \n")
         } else {
             
             let date = formattedDate(dateToFormat: dateTaken)
@@ -199,23 +195,7 @@ extension FlickrClient {
         }
         
     }
-    
-    // Convert url for image to NSData
-    func convertImageData(urlString: String) -> NSData {
-        var imageData = NSData()
         
-        let url = NSURL(string: urlString)
-        
-        if let image = NSData(contentsOf: url! as URL) {
-            imageData = image
-        } else {
-            print("Could not convert url to image data")
-
-        }
-        
-        return imageData
-    }
-    
     // Format date to Date type
     func formattedDate(dateToFormat: String) -> Date {
         var date = Date()
@@ -224,7 +204,6 @@ extension FlickrClient {
         
         if let formattedDate = formatter.date(from: "\(dateToFormat)") {
             date = formattedDate
-            // print("\n formatted date is: \(formattedDate) \n")
             
         } else {
             print("\n Could not get date from String \n ")

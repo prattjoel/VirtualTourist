@@ -27,12 +27,10 @@ class CollectionDataSource: NSObject, UICollectionViewDataSource {
          let image = UIImage(data: imageData as Data)
              cell.cellImageView?.image = image
              cell.indicator.stopAnimating()
-            print("UIImage added to cell")
         } else {
-            print("no image data provided for cell")
+            print("no image data for cell")
         }
         
         return cell
     }
-    
 }

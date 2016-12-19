@@ -19,6 +19,8 @@ class MapViewController: UIViewController, MKMapViewDelegate {
     var pins = [Pin]()
     var CoreStack = CoreDataStack(modelName: "Model")
     
+    //MARK: - View Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -30,10 +32,9 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         mapView.removeAnnotations(annotations)
         fetchPinsFromContext()
-        print("\n the annotations count in viewWillAppear is: \(annotations.count) \n")
     }
     
-    // MARK: - Initial pin creation methods
+    // MARK: - Pin creation methods
     
     // Create pin after long press
     @IBAction func addPin(_ sender: UILongPressGestureRecognizer) {
@@ -53,18 +54,10 @@ class MapViewController: UIViewController, MKMapViewDelegate {
             }
             
             if let pin = addPinToContext(context: stack.context, coordinate: coordinate) {
-                //pins.append(pin)
+                pins.append(pin)
                 mapView.removeAnnotations(annotations)
                 
                 fetchPinsFromContext()
-                print("addPin: Pins in context \(pins.count)")
-                print("addPin: annotations in map \(annotations.count)")
-                
-                //                let controller = storyboard?.instantiateViewController(withIdentifier: "LocationViewController") as! LocationViewController
-                //                controller.currentPin = pin
-                //                controller.objContext = stack.context
-                //                controller.coreDataStack = stack
-                //                self.navigationController?.pushViewController(controller, animated: true)
             } else {
                 print("no pin found for addPin")
             }
@@ -94,8 +87,11 @@ class MapViewController: UIViewController, MKMapViewDelegate {
                 pin = Pin.init(lat: lat, lon: lon, incontext: context)
             }
             
-            print("\n number of current pins is \(pins.count) \n")
-            
+            do {
+                try context.save()
+            } catch let error {
+                print("error saving context in addPinToContext: \(error)")
+            }
             return pin
         }
     }
@@ -115,15 +111,13 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         context.performAndWait {
             pins = try! context.fetch(fr) as! [Pin]
         }
-        print("pins in context for fetch in MapView: \(pins?.count)")
-        
         addPinsToMap(pins: pins!)
     }
     
     // Adds pins from context to map view
     func addPinsToMap(pins: [Pin]) {
         annotations.removeAll()
-        self.pins.removeAll()
+       self.pins.removeAll()
         for pin in pins {
             
             let annotation = MKPointAnnotation()
@@ -160,16 +154,6 @@ class MapViewController: UIViewController, MKMapViewDelegate {
         
         if view.isSelected == true {
             
-            //mapView.removeAnnotations(annotations)
-            //fetchPinsFromContext()
-            print("\n number of pins: \(pins.count)")
-            print("\n number of annotations: \(annotations.count) \n")
-            
-            //            guard let annotation = view.annotation else {
-            //                print("the select pin does not have an annotation")
-            //                return
-            //            }
-            
             if let index = annotations.index(of: view.annotation as! MKPointAnnotation) {
                 
                 let pin = pins[index]
@@ -184,7 +168,7 @@ class MapViewController: UIViewController, MKMapViewDelegate {
                 controller.coreDataStack = stack
                 self.navigationController?.pushViewController(controller, animated: true)
             } else {
-                print("No index found for selected pin")
+                print("No index found for selected pin in didSelect view")
             }
         }
     }

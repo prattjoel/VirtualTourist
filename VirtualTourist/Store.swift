@@ -11,10 +11,8 @@ import CoreData
 import UIKit
 
 class Store {
-    
-    let stack = CoreDataStack(modelName: "Model")
-    var photoStore = [Photo]()
-    
+        
+    //MARK: - Fetch photos from context
     func getPhotos(predicate: NSPredicate, sortDescriptors: [NSSortDescriptor]?, context: NSManagedObjectContext?) throws -> [Photo]? {
         
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Photo")
@@ -39,10 +37,11 @@ class Store {
         }
         
         return photos
-        
-        
     }
     
+    //MARK: Get image data for photo
+    
+    // Download the image data for a photo
     func addPhotoImage(photo: Photo, context: NSManagedObjectContext, completion: @escaping (NSData) -> Void) -> Void {
         let urlString = photo.url
         
@@ -50,6 +49,7 @@ class Store {
             
             if photo.image != nil {
                 completion(photo.imageData!)
+                print("photo already had image data")
             } else {
                 
                 let imageData = self.convertImageData(urlString: urlString)
@@ -70,7 +70,6 @@ class Store {
             print("Could not convert url to image data in Store \n")
             
         }
-        
         return imageData
     }
 }

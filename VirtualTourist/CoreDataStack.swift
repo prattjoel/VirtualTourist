@@ -19,7 +19,6 @@ struct CoreDataStack {
     private let modelURL: URL
     internal let dbURL: URL
     let context: NSManagedObjectContext
-    let backgroundContext: NSManagedObjectContext
     
     // MARK: Initializers
     
@@ -45,10 +44,6 @@ struct CoreDataStack {
         // create a context and add connect it to the coordinator
         context = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         context.persistentStoreCoordinator = coordinator
-        
-        //create background context
-        backgroundContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        backgroundContext.parent = context
         
         // Add a SQLite store located in the documents folder
         let fm = FileManager.default
@@ -99,23 +94,5 @@ extension CoreDataStack {
         }
     }
     
-    func autoSave(_ delayInSeconds : Int) {
-        
-        if delayInSeconds > 0 {
-            do {
-                try saveContext()
-                print("Autosaving")
-            } catch {
-                print("Error while autosaving")
-            }
-            
-            let delayInNanoSeconds = UInt64(delayInSeconds) * NSEC_PER_SEC
-            let time = DispatchTime.now() + Double(Int64(delayInNanoSeconds)) / Double(NSEC_PER_SEC)
-            
-            DispatchQueue.main.asyncAfter(deadline: time) {
-                self.autoSave(delayInSeconds)
-            }
-        }
-    }
 }
 
